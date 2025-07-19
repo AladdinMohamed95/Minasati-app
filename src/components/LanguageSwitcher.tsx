@@ -1,22 +1,45 @@
-import { useTranslation } from "react-i18next";
-import { Pressable, Text, View } from "react-native";
+// components/LanguageSwitcher.tsx
+import { useTranslationContext } from "@/context/TranslationContext";
+import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
-export default function LanguageSwitcher() {
-  const { i18n } = useTranslation();
-
-  const toggleLanguage = () => {
-    const newLang = i18n.language === "ar" ? "en" : "ar";
-    i18n.changeLanguage(newLang);
-  };
+const LanguageSwitcher = () => {
+  const { toggleLanguage, language } = useTranslationContext();
 
   return (
-    <Pressable onPress={toggleLanguage}>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-        <Text style={{ fontSize: 16 }}>🌐</Text>
-        <Text style={{ fontSize: 16 }}>
-          {i18n.language === "ar" ? "العربية" : "English"}
-        </Text>
-      </View>
-    </Pressable>
+    <View style={styles.container}>
+      <Pressable onPress={toggleLanguage} style={styles.langSwitcher}>
+        <Ionicons name="globe-outline" size={12} color="#333" />
+        <Text style={styles.langText}>{language === "ar" ? "ع" : "En"}</Text>
+      </Pressable>
+    </View>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  container: {
+    position: "absolute",
+    top: 10,
+    left: 10,
+    zIndex: 9999,
+  },
+  langSwitcher: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    backgroundColor: "#f2f2f2",
+    borderWidth: 0.1,
+    maxWidth: 38,
+  },
+  langText: {
+    fontSize: 10,
+    fontWeight: "bold",
+    color: "#333",
+  },
+});
+
+export default LanguageSwitcher;

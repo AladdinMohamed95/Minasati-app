@@ -1,60 +1,89 @@
-import { Tabs } from "expo-router";
+// app/_layout.tsx
+import { ErrorHandler } from "@/components/ErrorHandler";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import ThemeToggle from "@/components/ThemeToggle";
+import { LoadinggProvider } from "@/context/LoadingContext";
+import { ThemeProvider, useTheme } from "@/context/ThemeContext";
+import { TranslationProvider } from "@/context/TranslationContext";
+import { UserProvider } from "@/context/UserContext";
+import * as Font from "expo-font";
+import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { Platform } from "react-native";
+import { ActivityIndicator, View } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { HapticTab } from "@/components/HapticTab";
-import { IconSymbol } from "@/components/ui/IconSymbol";
-import TabBarBackground from "@/components/ui/TabBarBackground";
-import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/hooks/useColorScheme";
-import "@/i18n";
+// This component handles the status bar based on theme
+const ThemedStatusBar: React.FC = () => {
+  const { theme } = useTheme();
+  return <StatusBar style={theme.statusBar} />;
+};
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+// Root layout component
+const RootLayoutNav: React.FC = () => {
+  const [fontsLoaded] = Font.useFonts({
+    "Cairo-Regular": require("@/assets/fonts/Cairo-Regular.ttf"),
+    "Cairo-Bold": require("@/assets/fonts/Cairo-Bold.ttf"),
+    "Cairo-Light": require("@/assets/fonts/Cairo-Light.ttf"),
+    "Cairo-Medium": require("@/assets/fonts/Cairo-Medium.ttf"),
+  });
 
+  if (!fontsLoaded) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: "absolute",
-          },
-          default: {},
-        }),
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Home",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
-          ),
+    <>
+      <ThemedStatusBar />
+      <LanguageSwitcher />
+      <ThemeToggle />
+      <Stack
+        screenOptions={{
+          headerShown: false,
         }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: "Explore",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="paperplane.fill" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profile",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="person.crop.circle" color={color} />
-          ),
-        }}
-      />
-    </Tabs>
+      >
+        <Stack.Screen name="index" />
+        <Stack.Screen name="(tabs)" />
+      </Stack>
+    </>
   );
-}
+};
+
+const loading = (
+  <View
+    style={{
+      justifyContent: "center",
+      alignContent: "center",
+      alignItems: "center",
+      height: "100%",
+    }}
+  >
+    <ActivityIndicator />
+  </View>
+);
+
+// Main layout wrapper with theme provider
+const RootLayout: React.FC = () => {
+  return (
+    <SafeAreaProvider>
+      <ErrorHandler>
+        <TranslationProvider>
+          <React.Suspense fallback={loading}>
+            <ThemeProvider>
+              <UserProvider>
+                <LoadinggProvider>
+                  <RootLayoutNav />
+                </LoadinggProvider>
+              </UserProvider>
+            </ThemeProvider>
+          </React.Suspense>
+        </TranslationProvider>
+      </ErrorHandler>
+    </SafeAreaProvider>
+  );
+};
+
+export default RootLayout;

@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Minasati",
-    "slug": "Minasati",
+    "name": "منصة الماسة التعليمية",
+    "slug": "almasa-learning-platform",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "minasati",
+    "scheme": "almasa-learning-platform",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -34,7 +34,8 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true

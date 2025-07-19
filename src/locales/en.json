@@ -1,7 +1,14 @@
 {
-  "home": {
-    "title": "Welcome",
-    "description": "This is the English content."
-  },
-  "language": "English"
+  "welcome": "Welcome to the app",
+  "register": "Register with phone number",
+  "login": "Login",
+  "logout": "Logout",
+  "home": "Home",
+  "language": "English",
+  "slug": "Learn with the best teachers online",
+  "slugDesc": "Learn with interactive methods with a selection of the best teachers",
+  "guest": "Browse as Guest",
+  "newTeacher": "Are you a new teacher? ",
+  "teacherSignup": "Sign up here",
+  "contactus": "Do you have a question? Contact us"
 }

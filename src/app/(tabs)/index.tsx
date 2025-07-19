@@ -1,87 +1,93 @@
-import { Image } from "expo-image";
-import { Platform, StyleSheet } from "react-native";
-
-import { HelloWave } from "@/components/HelloWave";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
+import { PrimaryButton, SecondaryButton } from "@/components/AppButton";
+import AppText from "@/components/AppText";
+import { useTranslationContext } from "@/context/TranslationContext";
+import { useUser } from "@/context/UserContext";
+import { styles } from "@/styles/loginStyles";
+import { useRouter } from "expo-router";
+import React from "react";
 import { useTranslation } from "react-i18next";
+import { SafeAreaView, StatusBar, TouchableOpacity, View } from "react-native";
 
-export default function HomeScreen() {
+const RegisterScreen = () => {
+  const { login } = useUser();
+  const router = useRouter();
   const { t } = useTranslation();
+  const { language } = useTranslationContext();
+
+  const handlePhoneRegister = () => {
+    login({
+      id: "001",
+      name: "Aladdin",
+      type: "student",
+    });
+    router.push("/profile");
+  };
+
+  const handleGuestBrowse = () => {
+    login({
+      id: "guest",
+      name: "guest",
+      type: "guest",
+    });
+    router.push("/home");
+  };
+
+  const handleTeacherSignup = () => {
+    login({
+      id: "new-teacher",
+      name: "teacher",
+      type: "teacher",
+    });
+    router.push("/home");
+  };
+
+  const handleContactUs = () => {
+    // Handle contact us
+    console.log("Contact us pressed");
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-      headerImage={
-        <Image
-          source={require("@/assets/images/partial-react-logo.png")}
-          style={styles.reactLogo}
-        />
-      }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome Aladdin!</ThemedText>
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
-        <HelloWave />
-      </ThemedView>
-      <ThemedView>
-        <ThemedText>{t("home.title")}</ThemedText>
-        <ThemedText>{t("home.description")}</ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit{" "}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText>{" "}
-          to see changes. Press{" "}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: "cmd + d",
-              android: "cmd + m",
-              web: "F12",
-            })}
-          </ThemedText>{" "}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">
-            npm run reset-project
-          </ThemedText>{" "}
-          to get a fresh <ThemedText type="defaultSemiBold">app</ThemedText>{" "}
-          directory. This will move the current{" "}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{" "}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      <View style={styles.logoContainer}>
+        <View style={styles.logoPlaceholder}>
+          <AppText style={styles.logoText}>LOGO</AppText>
+        </View>
+      </View>
+
+      <View style={styles.descriptionContainer}>
+        <AppText style={styles.descriptionText}>{t("slug")}</AppText>
+        <AppText style={styles.subDescriptionText}>{t("slugDesc")}</AppText>
+      </View>
+
+      <View style={styles.buttonsContainer}>
+        <PrimaryButton title={t("register")} onPress={handlePhoneRegister} />
+        <SecondaryButton title={t("guest")} onPress={handleGuestBrowse} />
+      </View>
+
+      <View style={styles.footerContainer}>
+        <View
+          style={[
+            styles.teacherSignupContainer,
+            { flexDirection: language === "ar" ? "row-reverse" : "row" },
+          ]}
+        >
+          <AppText style={styles.teacherText}>{t("newTeacher")}</AppText>
+          <TouchableOpacity onPress={handleTeacherSignup}>
+            <AppText style={styles.teacherLink}>{t("teacherSignup")}</AppText>
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity
+          style={styles.contactContainer}
+          onPress={handleContactUs}
+        >
+          <AppText style={styles.contactText}>{t("contactus")}</AppText>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
-  },
-});
+export default RegisterScreen;
