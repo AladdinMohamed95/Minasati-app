@@ -3,11 +3,32 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 type UserType = "guest" | "student" | "teacher" | "admin";
 
+export type formDataProps = {
+  fullName: string;
+  specialization: string;
+  qualification: string;
+  yearsExperience: string;
+  currentWorkplace: string;
+  workAddress: string;
+  homeAddress: string;
+  phoneNumber: string;
+  alternatePhone: string;
+  nationalIdEgypt: string;
+  residenceIdAbroad: string;
+  identification: string;
+  dateOfBirth: string;
+  parentPhone: string;
+  email: string;
+  address: string;
+  educationLevel: string;
+  school: string;
+};
 interface User {
   id: string;
   name: string;
   type: UserType;
   token?: string;
+  data?: Partial<formDataProps>;
 }
 
 interface UserConextType {

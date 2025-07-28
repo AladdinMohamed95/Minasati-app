@@ -10,5 +10,63 @@
   "guest": "تصفح كزائر",
   "newTeacher": "هل أنت معلم جديد؟ ",
   "teacherSignup": "سجل من هنا",
-  "contactus": "لديك سؤال؟ اتصل بنا"
+  "contactus": "لديك سؤال؟ اتصل بنا",
+
+  "fullNameError": "الاسم الكامل مطلوب",
+  "specializationError": "التخصص مطلوب",
+  "qualificationError": " المؤهل الدراسي مطلوب",
+  "yearsExperienceError": "سنوات الخبرة مطلوبة",
+  "currentWorkplaceError": "المكان الحالي للعمل مطلوب",
+  "workAddressError": "عنوان العمل الحالي مطلوب",
+  "homeAddressError": "عنوان المنزل مطلوب",
+  "phoneNumberError": "رقم الهاتف مطلوب",
+  "identificationError": "الرقم القومي المصري أو رقم الإقامة خارج مصر مطلوب",
+
+  "dateOfBirthError": "تاريخ الميلاد مطلوب",
+  "educationLevelError": "المستوى التعليمي مطلوب",
+  "emailError": "البريد الإلكتروني غير صحيح",
+
+  "teacherRegisterationTitle": "تسجيل معلم جديد",
+  "studentRegisterationTitle": "تسجيل الطالب",
+  "fullName": "الاسم الكامل",
+  "specialization": "التخصص",
+  "qualification": "المؤهل الدراسي",
+  "yearsOfExperience": "سنوات الخبرة",
+  "currentWorkplace": "المكان الحالي للعمل",
+  "workAddress": "عنوان العمل الحالي",
+  "homeAddress": "عنوان المنزل",
+  "phoneNumber": "رقم الهاتف",
+  "alternativePhoneNumber": "رقم الهاتف الاحتياطي",
+  "nationalIdEgypt": "الرقم القومي المصري",
+  "residenceIdAbroad": "رقم الإقامة خارج مصر",
+  "registerButton": "تسجيل",
+  "cancleButton": "إلغاء",
+
+  "dateOfBirth": "تاريخ الميلاد",
+  "educationLevel": "المستوى التعليمي",
+  "email": "البريد الإلكتروني",
+  "parentPhoneNumber": "رقم هاتف ولي الأمر",
+  "schoolName": "اسم المدرسة/الجامعة",
+
+  "teachersScreen": {
+    "headerTitle": "معلمونا",
+    "headerSubtitle": "تعرف على معلمينا المؤهلين وذوي الخبرة",
+    "studyMaterials": "مواد الدراسة:",
+    "viewProfile": "عرض الملف الشخصي",
+    "students": " طالب",
+    "teacherName": "اسم المعلم",
+    "teacherBio": "السيرة الذاتية للمعلم",
+    "teacherSpecialization": "التخصص",
+    "teacherStudyMaterial": "مواد الدراسة"
+  },
+
+  "materialScreen": {
+    "headerTitle": "المواد التعليمية",
+    "headerSubtitle": "استكشف مجموعة متنوعة من المواد التعليمية",
+    "materialName": "اسم المادة",
+    "courses": "الدورات",
+    "duration": "مدة الدورة",
+    "level": "مستوى الدورة",
+    "explore": "استكشاف المادة"
+  }
 }

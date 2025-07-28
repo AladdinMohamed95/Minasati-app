@@ -10,5 +10,64 @@
   "guest": "Browse as Guest",
   "newTeacher": "Are you a new teacher? ",
   "teacherSignup": "Sign up here",
-  "contactus": "Do you have a question? Contact us"
+  "contactus": "Do you have a question? Contact us",
+
+  "fullNameError": "Full name is required",
+  "specializationError": "Specialization is required",
+  "qualificationError": "Educational qualification is required",
+  "yearsExperienceError": "Years of experience are required",
+  "currentWorkplaceError": "Current workplace is required",
+  "workAddressError": "Current work address is required",
+  "homeAddressError": "Home address is required",
+  "phoneNumberError": "Phone number is required",
+  "identificationError": "Egyptian national ID or residence number abroad is required",
+
+  "dateOfBirthError": "Date of birth is required",
+  "educationLevelError": "Education level is required",
+  "emailError": "Email is invalid",
+
+  "teacherRegisterationTitle": "New Teacher Registration",
+  "studentRegisterationTitle": "Student Registration",
+  "fullName": "Full Name",
+  "specialization": "Specialization",
+  "qualification": "Educational Qualification",
+  "yearsOfExperience": "Years of Experience",
+  "currentWorkplace": "Current Workplace",
+  "workAddress": "Current Work Address",
+  "homeAddress": "Home Address",
+  "phoneNumber": "Phone Number",
+  "alternativePhoneNumber": "Alternative Phone Number",
+  "nationalIdEgypt": "Egyptian National ID",
+  "residenceIdAbroad": "Residence Number Abroad",
+  "registerButton": "Register",
+  "cancleButton": "Cancel",
+
+  "dateOfBirth": "Date of Birth",
+  "educationLevel": "Education Level",
+  "email": "Email",
+  "parentPhoneNumber": "Parent's Phone Number",
+  "schoolName": "School/University Name",
+
+  "teachersScreen": {
+    "headerTitle": "Our Teachers",
+    "headerSubtitle": "Meet our qualified and experienced educators",
+    "studyMaterials": "Study Materials:",
+    "viewProfile": "View Profile",
+    "students": "students",
+    "teacherName": "Teacher Name",
+    "teacherBio": "Teacher Bio",
+    "teacherSpecialization": "Teacher Specialization",
+    "teacherStudyMaterial": "Teacher Study Material"
+  },
+
+  "materialScreen": {
+    "headerTitle": "Educational Materials",
+    "headerSubtitle": "Explore a variety of educational materials",
+    "materialName": "Material Name",
+    "viewProfile": "View Profile",
+    "courses": "Courses",
+    "duration": "Duration",
+    "level": "Level",
+    "explore": "Explore Material"
+  }
 }

@@ -1,26 +1,34 @@
+// @ts-ignore
+import Logo from "@/assets/images/icon.png";
 import { PrimaryButton, SecondaryButton } from "@/components/AppButton";
 import AppText from "@/components/AppText";
+import { LanguageSwitcher } from "@/components/PreferencesSwitcher";
+import { useTheme } from "@/context/ThemeContext";
 import { useTranslationContext } from "@/context/TranslationContext";
 import { useUser } from "@/context/UserContext";
-import { styles } from "@/styles/loginStyles";
+import { createStyles } from "@/styles";
+
 import { useRouter } from "expo-router";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { SafeAreaView, StatusBar, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  SafeAreaView,
+  StatusBar,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const RegisterScreen = () => {
   const { login } = useUser();
   const router = useRouter();
   const { t } = useTranslation();
   const { language } = useTranslationContext();
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
 
   const handlePhoneRegister = () => {
-    login({
-      id: "001",
-      name: "Aladdin",
-      type: "student",
-    });
-    router.push("/profile");
+    router.push("/studentRegisteration");
   };
 
   const handleGuestBrowse = () => {
@@ -29,30 +37,33 @@ const RegisterScreen = () => {
       name: "guest",
       type: "guest",
     });
-    router.push("/home");
+    router.push("/teacherScreen");
   };
 
   const handleTeacherSignup = () => {
-    login({
-      id: "new-teacher",
-      name: "teacher",
-      type: "teacher",
-    });
-    router.push("/home");
+    router.push("/teacherRegister");
   };
 
   const handleContactUs = () => {
-    // Handle contact us
     console.log("Contact us pressed");
+    router.push("/materialScreen");
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
+      <View style={styles.preferencesContainer}>
+        <LanguageSwitcher />
+        {/* <ThemeToggle /> */}
+      </View>
       <View style={styles.logoContainer}>
         <View style={styles.logoPlaceholder}>
-          <AppText style={styles.logoText}>LOGO</AppText>
+          <Image
+            source={Logo}
+            style={{ width: 100, height: 100, resizeMode: "contain" }}
+            accessibilityLabel="App Logo"
+          />
         </View>
       </View>
 
@@ -61,10 +72,18 @@ const RegisterScreen = () => {
         <AppText style={styles.subDescriptionText}>{t("slugDesc")}</AppText>
       </View>
 
-      <View style={styles.buttonsContainer}>
-        <PrimaryButton title={t("register")} onPress={handlePhoneRegister} />
-        <SecondaryButton title={t("guest")} onPress={handleGuestBrowse} />
-      </View>
+      <PrimaryButton
+        title={t("register")}
+        onPress={handlePhoneRegister}
+        theme={theme}
+        textStyle={styles.whiteText}
+      />
+      <SecondaryButton
+        title={t("guest")}
+        onPress={handleGuestBrowse}
+        theme={theme}
+        textStyle={styles.blackText}
+      />
 
       <View style={styles.footerContainer}>
         <View

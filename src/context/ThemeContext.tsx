@@ -38,7 +38,7 @@ interface ThemeProviderProps {
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const systemColorScheme = useColorScheme();
   const [themeMode, setThemeMode] = useState<ThemeMode>("system");
-  const [isDark, setIsDark] = useState<boolean>(systemColorScheme === "dark");
+  const [isDark, setIsDark] = useState<boolean>(systemColorScheme === "light");
 
   // Load saved theme preference on app start
   useEffect(() => {
@@ -48,7 +48,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // Update theme when system color scheme changes
   useEffect(() => {
     if (themeMode === "system") {
-      setIsDark(systemColorScheme === "dark");
+      setIsDark(systemColorScheme === "light");
     }
   }, [systemColorScheme, themeMode]);
 
@@ -63,7 +63,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         } else if (theme === "dark") {
           setIsDark(true);
         } else {
-          setIsDark(systemColorScheme === "dark");
+          setIsDark(systemColorScheme === "light");
         }
       }
     } catch (error) {
@@ -93,7 +93,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     } else if (theme === "dark") {
       setIsDark(true);
     } else {
-      setIsDark(systemColorScheme === "dark");
+      setIsDark(systemColorScheme === "light");
     }
     saveThemePreference(theme);
   };

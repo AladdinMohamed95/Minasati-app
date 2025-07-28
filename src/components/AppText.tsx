@@ -1,23 +1,16 @@
 import { useTheme } from "@/context/ThemeContext";
+import { createStyles } from "@/styles/styles";
 import React from "react";
-import { StyleSheet, Text, TextProps } from "react-native";
+import { Text, TextProps } from "react-native";
 
 const AppText: React.FC<TextProps> = ({ style, children, ...rest }) => {
   const { theme } = useTheme();
+  const styles = createStyles(theme);
   return (
-    <Text
-      style={[styles.text, { fontFamily: theme.fontFamily.regular }, style]}
-      {...rest}
-    >
+    <Text style={[{ fontFamily: theme.fontFamily.regular }, style]} {...rest}>
       {children}
     </Text>
   );
 };
-
-const styles = StyleSheet.create({
-  text: {
-    fontFamily: "Cairo-Regular",
-  },
-});
 
 export default AppText;

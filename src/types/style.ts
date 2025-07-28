@@ -32,7 +32,7 @@ export type FontWeightValue =
 
 // Define specific style types for your components
 export interface AppStyles
-  extends Record<string, ViewStyle | TextStyle | ImageStyle> {
+  extends Record<string, ViewStyle | TextStyle | ImageStyle | any> {
   container: ViewStyle;
   scrollView: ViewStyle;
   header: ViewStyle;
@@ -56,6 +56,19 @@ export interface AppStyles
   statItem: ViewStyle;
   statNumber: TextStyle;
   statLabel: TextStyle;
+  logoContainer: ViewStyle;
+  logoPlaceholder: ViewStyle;
+  logoText: TextStyle;
+  descriptionContainer: ViewStyle;
+  descriptionText: TextStyle;
+  subDescriptionText: TextStyle;
+  buttonsContainer: ViewStyle;
+  footerContainer: ViewStyle;
+  teacherSignupContainer: ViewStyle;
+  teacherText: TextStyle;
+  teacherLink: TextStyle;
+  contactContainer: ViewStyle;
+  contactText: TextStyle;
 }
 
 // Generic utility type for creating typed styles

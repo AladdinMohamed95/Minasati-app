@@ -10,7 +10,7 @@ import Animated, {
 import { ThemedView } from "@/components/ThemedView";
 import { useBottomTabOverflow } from "@/components/ui/TabBarBackground";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import LanguageSwitcher from "./LanguageSwitcher";
+import LanguageSwitcher from "./PreferencesSwitcher";
 
 const HEADER_HEIGHT = 250;
 
