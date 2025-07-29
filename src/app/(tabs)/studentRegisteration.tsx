@@ -117,7 +117,7 @@ const StudentRegistrationScreen = () => {
       });
 
       Alert.alert("نجح التسجيل", "تم تسجيل الطالب بنجاح", [
-        { text: "موافق", onPress: () => router.push("/home") },
+        { text: "موافق", onPress: () => router.push("/") },
       ]);
     } else {
       Alert.alert("خطأ في البيانات", "يرجى ملء جميع الحقول المطلوبة");
@@ -129,21 +129,22 @@ const StudentRegistrationScreen = () => {
   };
 
   const EducationLevelPicker = () => (
-    <View style={styles.pickerContainer}>
+    <View style={styles.otherViewStyle.pickerContainer}>
       {educationLevels.map((level, index) => (
         <TouchableOpacity
           key={index}
           style={[
-            styles.pickerOption,
-            formData.educationLevel === level && styles.pickerOptionSelected,
+            styles.otherViewStyle.pickerOption,
+            formData.educationLevel === level &&
+              styles.otherViewStyle.pickerOptionSelected,
           ]}
           onPress={() => handleInputChange("educationLevel", level)}
         >
           <AppText
             style={[
-              styles.pickerOptionText,
+              styles.otherViewStyle.pickerOptionText,
               formData.educationLevel === level &&
-                styles.pickerOptionTextSelected,
+                styles.otherViewStyle.pickerOptionTextSelected,
             ]}
           >
             {level}
@@ -154,30 +155,42 @@ const StudentRegistrationScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollContainer}>
-        <View style={styles.formContainer}>
-          <AppText style={styles.title}>
+    <SafeAreaView style={styles.homeScreen.container}>
+      <ScrollView style={styles.registerScreen.scrollContainer}>
+        <View style={styles.registerScreen.formContainer}>
+          <AppText style={styles.registerScreen.title}>
             {t("studentRegisterationTitle")}
           </AppText>
 
-          <View style={styles.inputContainer}>
-            <AppText style={styles.label}>{t("fullName")} *</AppText>
+          <View style={styles.registerScreen.inputContainer}>
+            <AppText style={styles.registerScreen.label}>
+              {t("fullName")} *
+            </AppText>
             <TextInput
-              style={[styles.input, errors.fullName && styles.inputError]}
+              style={[
+                styles.registerScreen.input,
+                errors.fullName && styles.registerScreen.inputError,
+              ]}
               value={formData.fullName}
               onChangeText={(text) => handleInputChange("fullName", text)}
               textAlign={language === "ar" ? "right" : "left"}
             />
             {errors.fullName && (
-              <AppText style={styles.errorText}>{errors.fullName}</AppText>
+              <AppText style={styles.registerScreen.errorText}>
+                {errors.fullName}
+              </AppText>
             )}
           </View>
 
-          <View style={styles.inputContainer}>
-            <AppText style={styles.label}>{t("dateOfBirth")} *</AppText>
+          <View style={styles.registerScreen.inputContainer}>
+            <AppText style={styles.registerScreen.label}>
+              {t("dateOfBirth")} *
+            </AppText>
             <TextInput
-              style={[styles.input, errors.dateOfBirth && styles.inputError]}
+              style={[
+                styles.registerScreen.input,
+                errors.dateOfBirth && styles.registerScreen.inputError,
+              ]}
               value={formData.dateOfBirth}
               onChangeText={(text) => handleInputChange("dateOfBirth", text)}
               placeholder="dd/mm/yyyy"
@@ -185,28 +198,39 @@ const StudentRegistrationScreen = () => {
               textAlign={language === "ar" ? "right" : "left"}
             />
             {errors.dateOfBirth && (
-              <AppText style={styles.errorText}>{errors.dateOfBirth}</AppText>
+              <AppText style={styles.registerScreen.errorText}>
+                {errors.dateOfBirth}
+              </AppText>
             )}
           </View>
 
-          <View style={styles.inputContainer}>
-            <AppText style={styles.label}>{t("phoneNumber")} *</AppText>
+          <View style={styles.registerScreen.inputContainer}>
+            <AppText style={styles.registerScreen.label}>
+              {t("phoneNumber")} *
+            </AppText>
             <TextInput
-              style={[styles.input, errors.phoneNumber && styles.inputError]}
+              style={[
+                styles.registerScreen.input,
+                errors.phoneNumber && styles.registerScreen.inputError,
+              ]}
               value={formData.phoneNumber}
               onChangeText={(text) => handleInputChange("phoneNumber", text)}
               keyboardType="phone-pad"
               textAlign={language === "ar" ? "right" : "left"}
             />
             {errors.phoneNumber && (
-              <AppText style={styles.errorText}>{errors.phoneNumber}</AppText>
+              <AppText style={styles.registerScreen.errorText}>
+                {errors.phoneNumber}
+              </AppText>
             )}
           </View>
 
-          <View style={styles.inputContainer}>
-            <AppText style={styles.label}>{t("parentPhoneNumber")}</AppText>
+          <View style={styles.registerScreen.inputContainer}>
+            <AppText style={styles.registerScreen.label}>
+              {t("parentPhoneNumber")}
+            </AppText>
             <TextInput
-              style={styles.input}
+              style={styles.registerScreen.input}
               value={formData.parentPhone}
               onChangeText={(text) => handleInputChange("parentPhone", text)}
               keyboardType="phone-pad"
@@ -214,10 +238,13 @@ const StudentRegistrationScreen = () => {
             />
           </View>
 
-          <View style={styles.inputContainer}>
-            <AppText style={styles.label}>{t("email")}</AppText>
+          <View style={styles.registerScreen.inputContainer}>
+            <AppText style={styles.registerScreen.label}>{t("email")}</AppText>
             <TextInput
-              style={[styles.input, errors.email && styles.inputError]}
+              style={[
+                styles.registerScreen.input,
+                errors.email && styles.registerScreen.inputError,
+              ]}
               value={formData.email}
               onChangeText={(text) => handleInputChange("email", text)}
               keyboardType="email-address"
@@ -225,14 +252,21 @@ const StudentRegistrationScreen = () => {
               textAlign={language === "ar" ? "right" : "left"}
             />
             {errors.email && (
-              <AppText style={styles.errorText}>{errors.email}</AppText>
+              <AppText style={styles.registerScreen.errorText}>
+                {errors.email}
+              </AppText>
             )}
           </View>
 
-          <View style={styles.inputContainer}>
-            <AppText style={styles.label}>{t("homeAddress")} *</AppText>
+          <View style={styles.registerScreen.inputContainer}>
+            <AppText style={styles.registerScreen.label}>
+              {t("homeAddress")} *
+            </AppText>
             <TextInput
-              style={[styles.input, errors.address && styles.inputError]}
+              style={[
+                styles.registerScreen.input,
+                errors.address && styles.registerScreen.inputError,
+              ]}
               value={formData.address}
               onChangeText={(text) => handleInputChange("address", text)}
               multiline={true}
@@ -241,34 +275,45 @@ const StudentRegistrationScreen = () => {
               textAlignVertical="top"
             />
             {errors.address && (
-              <AppText style={styles.errorText}>{errors.address}</AppText>
+              <AppText style={styles.registerScreen.errorText}>
+                {errors.address}
+              </AppText>
             )}
           </View>
 
-          <View style={styles.inputContainer}>
-            <AppText style={styles.label}>{t("educationLevel")} *</AppText>
+          <View style={styles.registerScreen.inputContainer}>
+            <AppText style={styles.registerScreen.label}>
+              {t("educationLevel")} *
+            </AppText>
             <EducationLevelPicker />
             {errors.educationLevel && (
-              <AppText style={styles.errorText}>
+              <AppText style={styles.registerScreen.errorText}>
                 {errors.educationLevel}
               </AppText>
             )}
           </View>
 
-          <View style={styles.inputContainer}>
-            <AppText style={styles.label}>{t("schoolName")}</AppText>
+          <View style={styles.registerScreen.inputContainer}>
+            <AppText style={styles.registerScreen.label}>
+              {t("schoolName")}
+            </AppText>
             <TextInput
-              style={styles.input}
+              style={styles.registerScreen.input}
               value={formData.school}
               onChangeText={(text) => handleInputChange("school", text)}
               textAlign={language === "ar" ? "right" : "left"}
             />
           </View>
 
-          <View style={styles.inputContainer}>
-            <AppText style={styles.label}>{t("nationalIdEgypt")}</AppText>
+          <View style={styles.registerScreen.inputContainer}>
+            <AppText style={styles.registerScreen.label}>
+              {t("nationalIdEgypt")}
+            </AppText>
             <TextInput
-              style={[styles.input, errors.identification && styles.inputError]}
+              style={[
+                styles.registerScreen.input,
+                errors.identification && styles.registerScreen.inputError,
+              ]}
               value={formData.nationalIdEgypt}
               onChangeText={(text) =>
                 handleInputChange("nationalIdEgypt", text)
@@ -278,10 +323,15 @@ const StudentRegistrationScreen = () => {
             />
           </View>
 
-          <View style={styles.inputContainer}>
-            <AppText style={styles.label}>{t("residenceIdAbroad")}</AppText>
+          <View style={styles.registerScreen.inputContainer}>
+            <AppText style={styles.registerScreen.label}>
+              {t("residenceIdAbroad")}
+            </AppText>
             <TextInput
-              style={[styles.input, errors.identification && styles.inputError]}
+              style={[
+                styles.registerScreen.input,
+                errors.identification && styles.registerScreen.inputError,
+              ]}
               value={formData.residenceIdAbroad}
               onChangeText={(text) =>
                 handleInputChange("residenceIdAbroad", text)
@@ -289,13 +339,13 @@ const StudentRegistrationScreen = () => {
               textAlign={language === "ar" ? "right" : "left"}
             />
             {errors.identification && (
-              <AppText style={styles.errorText}>
+              <AppText style={styles.registerScreen.errorText}>
                 {errors.identification}
               </AppText>
             )}
           </View>
 
-          <View style={styles.buttonsContainer}>
+          <View style={styles.registerScreen.buttonsContainer}>
             <PrimaryButton
               title={t("registerButton")}
               onPress={handleSubmit}

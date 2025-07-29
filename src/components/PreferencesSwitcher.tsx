@@ -1,7 +1,7 @@
 // components/LanguageSwitcher.tsx
 import { useTheme } from "@/context/ThemeContext";
 import { useTranslationContext } from "@/context/TranslationContext";
-import { createStyles } from "@/styles/styles";
+import { createStyles } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, Text } from "react-native";
@@ -13,9 +13,12 @@ export const LanguageSwitcher: React.FC = () => {
   const styles = createStyles(theme);
 
   return (
-    <Pressable onPress={toggleLanguage} style={styles.switcher}>
+    <Pressable
+      onPress={toggleLanguage}
+      style={styles.preferenceContainer.switcher}
+    >
       <Ionicons name="globe-outline" size={12} color="#333" />
-      <AppText style={styles.langText}>
+      <AppText style={styles.homeScreen.langText}>
         {language === "ar" ? "العربية" : "English"}
       </AppText>
     </Pressable>
@@ -28,9 +31,14 @@ export const ThemeToggle: React.FC = () => {
   const styles = createStyles(theme);
 
   return (
-    <Pressable onPress={toggleTheme} style={styles.switcher}>
+    <Pressable
+      onPress={toggleTheme}
+      style={styles.preferenceContainer.switcher}
+    >
       <Ionicons name={isDark ? "moon" : "sunny"} size={12} color="#333" />
-      <Text style={styles.langText}>{isDark ? "Dark" : "Light"}</Text>
+      <Text style={styles.homeScreen.langText}>
+        {isDark ? "Dark" : "Light"}
+      </Text>
     </Pressable>
   );
 };

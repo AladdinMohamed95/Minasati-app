@@ -30,47 +30,6 @@ export type FontWeightValue =
   | "heavy"
   | "black";
 
-// Define specific style types for your components
-export interface AppStyles
-  extends Record<string, ViewStyle | TextStyle | ImageStyle | any> {
-  container: ViewStyle;
-  scrollView: ViewStyle;
-  header: ViewStyle;
-  headerTitle: TextStyle;
-  card: ViewStyle;
-  cardTitle: TextStyle;
-  cardDescription: TextStyle;
-  difficultyBadge: ViewStyle;
-  mediumDifficulty: ViewStyle;
-  badgeText: TextStyle;
-  primaryButton: ViewStyle;
-  secondaryButton: ViewStyle;
-  quizButton: ViewStyle;
-  buttonText: TextStyle;
-  secondaryButtonText: TextStyle;
-  progressContainer: ViewStyle;
-  progressBar: ViewStyle;
-  progressFill: ViewStyle;
-  progressText: TextStyle;
-  statsContainer: ViewStyle;
-  statItem: ViewStyle;
-  statNumber: TextStyle;
-  statLabel: TextStyle;
-  logoContainer: ViewStyle;
-  logoPlaceholder: ViewStyle;
-  logoText: TextStyle;
-  descriptionContainer: ViewStyle;
-  descriptionText: TextStyle;
-  subDescriptionText: TextStyle;
-  buttonsContainer: ViewStyle;
-  footerContainer: ViewStyle;
-  teacherSignupContainer: ViewStyle;
-  teacherText: TextStyle;
-  teacherLink: TextStyle;
-  contactContainer: ViewStyle;
-  contactText: TextStyle;
-}
-
 // Generic utility type for creating typed styles
 export type TypedStyleSheet<
   T extends Record<string, ViewStyle | TextStyle | ImageStyle>

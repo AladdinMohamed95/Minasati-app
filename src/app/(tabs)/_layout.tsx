@@ -2,42 +2,51 @@
 import { ErrorHandler } from "@/components/ErrorHandler";
 import { LoadinggProvider } from "@/context/LoadingContext";
 import { ThemeProvider, useTheme } from "@/context/ThemeContext";
-import {
-  TranslationProvider,
-  useTranslationContext,
-} from "@/context/TranslationContext";
+import { TranslationProvider } from "@/context/TranslationContext";
 import { UserProvider } from "@/context/UserContext";
-import { createStyles } from "@/styles/styles";
-import * as Font from "expo-font";
+import { useFonts } from "@/hooks/useFonts";
+import { createStyles } from "@/styles";
+import { ConfigureRTL } from "@/utils";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { ActivityIndicator, I18nManager, View } from "react-native";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { ActivityIndicator, Platform, View } from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 // This component handles the status bar based on theme
 const ThemedStatusBar: React.FC = () => {
   const { theme } = useTheme();
-  const styles = createStyles(theme);
-  return <StatusBar style={styles.statusBar} />;
+
+  return (
+    <StatusBar
+      style={theme.isDark ? "light" : "dark"}
+      backgroundColor={
+        Platform.OS === "android" ? theme.background.primary : "transparent"
+      }
+      translucent={Platform.OS === "android" ? false : true}
+      animated={true}
+      hideTransitionAnimation="fade"
+    />
+  );
 };
 
 // Root layout component
 const RootLayoutNav: React.FC = () => {
-  const [fontsLoaded] = Font.useFonts({
-    "Cairo-Regular": require("@/assets/fonts/Cairo-Regular.ttf"),
-    "Cairo-Bold": require("@/assets/fonts/Cairo-Bold.ttf"),
-    "Cairo-Light": require("@/assets/fonts/Cairo-Light.ttf"),
-    "Cairo-Medium": require("@/assets/fonts/Cairo-Medium.ttf"),
-  });
-  const { language } = useTranslationContext();
-  const isRTL = language === "ar";
-  I18nManager.allowRTL(isRTL);
-  I18nManager.forceRTL(isRTL);
+  const [fontsLoaded] = useFonts();
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
+
+  ConfigureRTL();
 
   if (!fontsLoaded) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View
+        style={[
+          styles.loadingView.loadingContainer,
+          { backgroundColor: theme.background.primary },
+        ]}
+      >
+        <ThemedStatusBar />
         <ActivityIndicator size="large" />
       </View>
     );
@@ -45,30 +54,53 @@ const RootLayoutNav: React.FC = () => {
   return (
     <>
       <ThemedStatusBar />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
+      <SafeAreaView
+        style={[
+          styles.loadingView.safeArea,
+          { backgroundColor: theme.background.primary },
+        ]}
       >
-        <Stack.Screen name="index" />
-        <Stack.Screen name="(tabs)" />
-      </Stack>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: theme.background.primary },
+            animation: "slide_from_right",
+          }}
+        >
+          <Stack.Screen name="index" />
+          <Stack.Screen name="(tabs)" />
+        </Stack>
+      </SafeAreaView>
     </>
   );
 };
 
-const loading = (
-  <View
-    style={{
-      justifyContent: "center",
-      alignContent: "center",
-      alignItems: "center",
-      height: "100%",
-    }}
-  >
-    <ActivityIndicator />
-  </View>
-);
+const ThemedLoading: React.FC = React.memo(() => {
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
+  return (
+    <View
+      style={[
+        styles.loadingView.loadingWrapper,
+        { backgroundColor: theme.background.primary },
+      ]}
+    >
+      <ThemedStatusBar />
+      <ActivityIndicator size="large" color={theme.text.primary} />
+    </View>
+  );
+});
+
+const FallBack: React.FC = React.memo(() => {
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
+  return (
+    <View style={styles.loadingView.suspenseContainer}>
+      <StatusBar style="auto" />
+      <ActivityIndicator size="large" />
+    </View>
+  );
+});
 
 // Main layout wrapper with theme provider
 const RootLayout: React.FC = () => {
@@ -76,11 +108,13 @@ const RootLayout: React.FC = () => {
     <SafeAreaProvider>
       <ErrorHandler>
         <TranslationProvider>
-          <React.Suspense fallback={loading}>
+          <React.Suspense fallback={<FallBack />}>
             <ThemeProvider>
               <UserProvider>
                 <LoadinggProvider>
-                  <RootLayoutNav />
+                  <React.Suspense fallback={<ThemedLoading />}>
+                    <RootLayoutNav />
+                  </React.Suspense>
                 </LoadinggProvider>
               </UserProvider>
             </ThemeProvider>

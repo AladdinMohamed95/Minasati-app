@@ -3,6 +3,7 @@ import AppText from "@/components/AppText";
 import { useTheme } from "@/context/ThemeContext";
 import { useTranslationContext } from "@/context/TranslationContext";
 import { createStyles } from "@/styles";
+import { TeacherDataProps } from "@/types/types";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -15,7 +16,7 @@ import {
   View,
 } from "react-native";
 
-const teachersData = [
+const teachersData: TeacherDataProps[] = [
   {
     id: 1,
     name: "د. سارة جونسون",
@@ -158,32 +159,40 @@ const TeacherCard = ({ teacher, theme, language }) => {
   const { t } = useTranslation();
 
   return (
-    <TouchableOpacity style={styles.teacherCard} activeOpacity={0.7}>
-      <View style={styles.teacherHeader}>
-        <Image source={{ uri: teacher.image }} style={styles.teacherImage} />
-        <View style={styles.teacherInfo}>
-          <View style={styles.nameRatingRow}>
-            <AppText style={styles.teacherName}>
+    <TouchableOpacity
+      style={styles.teacherScreen.teacherCard}
+      activeOpacity={0.7}
+    >
+      <View style={styles.teacherScreen.teacherHeader}>
+        <Image
+          source={{ uri: teacher.image }}
+          style={styles.teacherScreen.teacherImage}
+        />
+        <View style={styles.teacherScreen.teacherInfo}>
+          <View style={styles.teacherScreen.nameRatingRow}>
+            <AppText style={styles.teacherScreen.teacherName}>
               {t("teachersScreen.teacherName")}: {teacher.name}
             </AppText>
 
-            <View style={styles.ratingContainer}>
-              <Text style={styles.starIcon}>⭐</Text>
-              <AppText style={styles.rating}>{teacher.rating}</AppText>
+            <View style={styles.teacherScreen.ratingContainer}>
+              <Text style={styles.teacherScreen.starIcon}>⭐</Text>
+              <AppText style={styles.teacherScreen.rating}>
+                {teacher.rating}
+              </AppText>
             </View>
           </View>
 
-          <View style={styles.metaRow}>
-            <View style={styles.specializationContainer}>
-              <Text style={styles.graduationIcon}>🎓</Text>
-              <AppText style={styles.specialization}>
+          <View style={styles.teacherScreen.metaRow}>
+            <View style={styles.teacherScreen.specializationContainer}>
+              <Text style={styles.teacherScreen.graduationIcon}>🎓</Text>
+              <AppText style={styles.teacherScreen.specialization}>
                 {t("teachersScreen.teacherSpecialization")}:
                 {teacher.specialization}
               </AppText>
             </View>
-            <View style={styles.studentsContainer}>
-              <Text style={styles.usersIcon}>👥</Text>
-              <AppText style={styles.studentsText}>
+            <View style={styles.teacherScreen.studentsContainer}>
+              <Text style={styles.teacherScreen.usersIcon}>👥</Text>
+              <AppText style={styles.teacherScreen.studentsText}>
                 {teacher.students} {t("teachersScreen.students")}
               </AppText>
             </View>
@@ -191,26 +200,22 @@ const TeacherCard = ({ teacher, theme, language }) => {
         </View>
       </View>
 
-      <AppText style={styles.bio}>{teacher.bio}</AppText>
+      <AppText style={styles.teacherScreen.bio}>{teacher.bio}</AppText>
 
-      <View style={styles.materialsSection}>
-        <AppText style={styles.materialsTitle}>
+      <View style={styles.teacherScreen.materialsSection}>
+        <AppText style={styles.teacherScreen.materialsTitle}>
           {t("teachersScreen.studyMaterials")}
         </AppText>
-        <View style={styles.materialsContainer}>
+        <View style={styles.teacherScreen.materialsContainer}>
           {teacher.studyMaterial.map((material, index) => (
-            <View key={index} style={styles.materialTag}>
-              <AppText style={styles.materialText}>{material}</AppText>
+            <View key={index} style={styles.teacherScreen.materialTag}>
+              <AppText style={styles.teacherScreen.materialText}>
+                {material}
+              </AppText>
             </View>
           ))}
         </View>
       </View>
-
-      <TouchableOpacity style={styles.viewProfileButton}>
-        <AppText style={styles.viewProfileText}>
-          {t("teachersScreen.viewProfile")}
-        </AppText>
-      </TouchableOpacity>
     </TouchableOpacity>
   );
 };
@@ -223,22 +228,22 @@ const TeachersScreen = () => {
   const styles = createStyles(theme);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.homeScreen.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
-      <View style={styles.headerContainer}>
-        <AppText style={styles.headerTitle}>
+      <View style={styles.teacherScreen.headerContainer}>
+        <AppText style={styles.teacherScreen.headerTitle}>
           {t("teachersScreen.headerTitle")}
         </AppText>
-        <AppText style={styles.headerSubtitle}>
+        <AppText style={styles.teacherScreen.headerSubtitle}>
           {t("teachersScreen.headerSubtitle")}
         </AppText>
       </View>
 
       <ScrollView
-        style={styles.scrollContainer}
+        style={styles.registerScreen.scrollContainer}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={styles.teacherScreen.scrollContent}
       >
         {teachersData.map((teacher) => (
           <TeacherCard

@@ -1,4 +1,6 @@
 import AppText from "@/components/AppText";
+import { useTheme } from "@/context/ThemeContext";
+import { createStyles } from "@/styles";
 import { EducationStages, ModalProps } from "@/types/types";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
@@ -9,9 +11,10 @@ export const ModalView = React.memo(
     modalVisible,
     handleCancel,
     selectedStage,
-    styles,
     handleConfirm,
   }: ModalProps) => {
+    const { theme } = useTheme();
+    const styles = createStyles(theme);
     const stages: Array<EducationStages> = useMemo(
       () => [
         { id: 1, name: "أولى ابتدائي" },
@@ -38,47 +41,49 @@ export const ModalView = React.memo(
         visible={modalVisible}
         onRequestClose={handleCancel}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
+        <View style={styles.modalView.modalOverlay}>
+          <View style={styles.modalView.modalContainer}>
             {/* Header */}
-            <View style={styles.header}>
+            <View style={styles.teacherScreen.header}>
               <TouchableOpacity
-                style={styles.closeButton}
+                style={styles.modalView.closeButton}
                 onPress={handleCancel}
               >
                 <Ionicons name="close" size={24} color="#6b7280" />
               </TouchableOpacity>
-              <View style={styles.headerContent}>
+              <View style={styles.modalView.headerContent}>
                 <Ionicons name="school" size={24} color="#3b82f6" />
-                <AppText style={styles.modalHeaderTitle}>
+                <AppText style={styles.modalView.modalHeaderTitle}>
                   مرحلتك الدراسية
                 </AppText>
               </View>
             </View>
 
             {/* Content */}
-            <View style={styles.content}>
-              <AppText style={styles.subtitle}>
+            <View style={styles.modalView.content}>
+              <AppText style={styles.modalView.subtitle}>
                 اختر المرحلة الدراسية المناسبة لك
               </AppText>
 
               <ScrollView
-                style={styles.stagesList}
+                style={styles.modalView.stagesList}
                 showsVerticalScrollIndicator={true}
               >
                 {stages.map((stage, index) => (
                   <TouchableOpacity
                     key={index}
                     style={[
-                      styles.stageItem,
-                      selectedStage === stage && styles.stageItemSelected,
+                      styles.modalView.stageItem,
+                      selectedStage === stage &&
+                        styles.modalView.stageItemSelected,
                     ]}
                     onPress={() => handleConfirm(stage)}
                   >
                     <AppText
                       style={[
-                        styles.stageText,
-                        selectedStage === stage && styles.stageTextSelected,
+                        styles.modalView.stageText,
+                        selectedStage === stage &&
+                          styles.modalView.stageTextSelected,
                       ]}
                     >
                       {stage.name}
