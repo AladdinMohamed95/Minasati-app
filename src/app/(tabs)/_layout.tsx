@@ -3,13 +3,13 @@ import { ErrorHandler } from "@/components/ErrorHandler";
 import { LoadinggProvider } from "@/context/LoadingContext";
 import { ThemeProvider, useTheme } from "@/context/ThemeContext";
 import { TranslationProvider } from "@/context/TranslationContext";
-import { UserProvider } from "@/context/UserContext";
+import { UserProvider, useUser } from "@/context/UserContext";
 import { useFonts } from "@/hooks/useFonts";
 import { createStyles } from "@/styles";
 import { ConfigureRTL } from "@/utils";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { useEffect } from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
@@ -35,10 +35,22 @@ const RootLayoutNav: React.FC = () => {
   const [fontsLoaded] = useFonts();
   const { theme } = useTheme();
   const styles = createStyles(theme);
+  const { isLoading, isInitializing, login, user } = useUser();
+  const router = useRouter();
 
   ConfigureRTL();
 
-  if (!fontsLoaded) {
+  useEffect(() => {
+    if (fontsLoaded && !isLoading && !isInitializing) {
+      if (user?.id) {
+        router.replace("/");
+      } else {
+        router.replace("/loginScreen");
+      }
+    }
+  }, [fontsLoaded, isLoading, isInitializing, user?.id]);
+
+  if (!fontsLoaded || isLoading || isInitializing) {
     return (
       <View
         style={[
@@ -51,6 +63,7 @@ const RootLayoutNav: React.FC = () => {
       </View>
     );
   }
+
   return (
     <>
       <ThemedStatusBar />
@@ -69,6 +82,7 @@ const RootLayoutNav: React.FC = () => {
         >
           <Stack.Screen name="index" />
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="loginScreen" />
         </Stack>
       </SafeAreaView>
     </>

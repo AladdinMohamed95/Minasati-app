@@ -1,5 +1,7 @@
 {
+  "Hello": "Hello",
   "welcome": "Welcome to the app",
+  "welcomeGuest": "Welcome Guest",
   "register": "Register with phone number",
   "login": "Login",
   "logout": "Logout",
@@ -9,8 +11,37 @@
   "slugDesc": "Learn with interactive methods with a selection of the best teachers",
   "guest": "Browse as Guest",
   "newTeacher": "Are you a new teacher? ",
+  "newStudent": "Are you a new student? ",
   "teacherSignup": "Sign up here",
   "contactus": "Do you have a question? Contact us",
+
+  "nameError": "Name error",
+  "passwordRequiredError": "Password is required",
+  "passwordTooShortError": "Password is too short",
+  "confirmPasswordRequiredError": "Password confirmation is required",
+  "passwordsDoNotMatchError": "Passwords do not match",
+
+  "name": "Name",
+  "phone": "Phone number",
+  "password": "Password",
+  "password_confirmation": "Confirm password",
+
+  "dataError": "Data Error",
+  "fillAllRequiredFields": "Please fill all required fields",
+  "registrationSuccess": "Registration Successful",
+  "studentRegisteredSuccessfully": "Student registered successfully",
+  "registrationError": "Registration Error",
+  "registrationFailed": "Registration failed",
+  "ok": "OK",
+  "registering": "Registering...",
+  "cancelButton": "Cancel",
+  "type": "User type",
+  "registeredAt": "Registered at",
+  "edit": "Edit profile",
+  "updating": "Updating...",
+  "updateButton": "Edit",
+
+  "loginError": "Login failed. Please check your credentials.",
 
   "fullNameError": "Full name is required",
   "specializationError": "Specialization is required",
@@ -28,6 +59,7 @@
 
   "teacherRegisterationTitle": "New Teacher Registration",
   "studentRegisterationTitle": "Student Registration",
+  "editStudentTitle": "edit student info",
   "fullName": "Full Name",
   "specialization": "Specialization",
   "qualification": "Educational Qualification",
@@ -69,5 +101,7 @@
     "duration": "Duration",
     "level": "Level",
     "explore": "Explore Material"
-  }
+  },
+
+  "booknow": "Book now"
 }

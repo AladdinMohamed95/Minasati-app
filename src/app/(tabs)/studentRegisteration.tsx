@@ -1,361 +1,295 @@
 // @ts-ignore
-import { PrimaryButton, SecondaryButton } from "@/components/AppButton";
+import { studentRegister } from "@/api/auth";
+import { PrimaryButton } from "@/components/AppButton";
 import AppText from "@/components/AppText";
 import { useTheme } from "@/context/ThemeContext";
 import { useTranslationContext } from "@/context/TranslationContext";
-import { formDataProps, useUser } from "@/context/UserContext";
+import { useUser } from "@/context/UserContext";
 import { createStyles } from "@/styles";
-import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { StudentProfileRequest } from "@/types/api";
+import { formDataProps } from "@/types/types";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  ActivityIndicator,
   Alert,
   SafeAreaView,
   ScrollView,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 
-const StudentRegistrationScreen = () => {
-  const { login } = useUser();
+const StudentFormScreen = () => {
   const router = useRouter();
   const { t } = useTranslation();
   const { language } = useTranslationContext();
   const { theme } = useTheme();
   const styles = createStyles(theme);
+  const params = useLocalSearchParams();
+  const isEdit = params.mode === "edit";
+  const { updateUser } = useUser();
 
   const [formData, setFormData] = useState<
-    Pick<
-      formDataProps,
-      | "fullName"
-      | "dateOfBirth"
-      | "phoneNumber"
-      | "parentPhone"
-      | "email"
-      | "address"
-      | "educationLevel"
-      | "school"
-      | "nationalIdEgypt"
-      | "residenceIdAbroad"
-    >
+    Pick<formDataProps, "name" | "phone" | "password" | "password_confirmation">
   >({
-    fullName: "",
-    dateOfBirth: "",
-    phoneNumber: "",
-    parentPhone: "",
-    email: "",
-    address: "",
-    educationLevel: "",
-    school: "",
-    nationalIdEgypt: "",
-    residenceIdAbroad: "",
+    name: "",
+    phone: "",
+    password: "",
+    password_confirmation: "",
   });
 
-  const [errors, setErrors] = useState<Partial<formDataProps>>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<"name" | "phone" | "password" | "confirm_password", string>>
+  >({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  const educationLevels = [
-    "ابتدائي",
-    "إعدادي",
-    "ثانوي",
-    "جامعي",
-    "دراسات عليا",
-  ];
-
-  const handleInputChange = (field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors((prev) => ({
-        ...prev,
-        [field]: null,
-      }));
+  // حل أكتر فعالية: استخدم useEffect مرة واحدة فقط عند mount
+  useEffect(() => {
+    if (isEdit && params.studentData && !isInitialized) {
+      try {
+        const studentData = JSON.parse(params.studentData as string);
+        setFormData({
+          name: studentData.name || "",
+          phone: studentData.phone || "",
+          password: "",
+          password_confirmation: "",
+        });
+        setIsInitialized(true);
+      } catch (error) {
+        console.error("Error parsing student data:", error);
+      }
+    } else if (!isEdit) {
+      setIsInitialized(true);
     }
+  }, [isEdit, params.studentData, isInitialized]);
+
+  const handleInputChange = (field: keyof typeof formData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({
+      ...prev,
+      [field === "password_confirmation" ? "confirm_password" : field]:
+        undefined,
+    }));
   };
 
   const validateForm = () => {
-    const newErrors: Partial<formDataProps> = {};
+    const { name, phone, password, password_confirmation } = formData;
 
-    if (!formData.fullName.trim()) newErrors.fullName = t("fullNameError");
-    if (!formData.dateOfBirth.trim())
-      newErrors.dateOfBirth = t("dateOfBirthError");
-    if (!formData.phoneNumber.trim())
-      newErrors.phoneNumber = t("phoneNumberError");
-    if (!formData.address.trim()) newErrors.address = t("homeAddressError");
-    if (!formData.educationLevel.trim())
-      newErrors.educationLevel = t("educationLevelError");
+    const newErrors: Partial<
+      Record<"name" | "phone" | "password" | "confirm_password", string>
+    > = {};
 
-    // Email validation if provided
-    if (formData.email.trim() && !formData.email.includes("@")) {
-      newErrors.email = t("emailError");
-    }
+    if (!name?.trim()) newErrors.name = t("nameError");
+    if (!phone?.trim()) newErrors.phone = t("phoneNumberError");
 
-    // Either Egyptian national ID or abroad residence ID is required
-    if (
-      !formData.nationalIdEgypt.trim() &&
-      !formData.residenceIdAbroad.trim()
-    ) {
-      newErrors.identification = t("identificationError");
+    if (!isEdit) {
+      if (!password?.trim()) {
+        newErrors.password = t("passwordRequiredError");
+      } else if (password.length < 6) {
+        newErrors.password = t("passwordTooShortError");
+      }
+
+      if (!password_confirmation?.trim()) {
+        newErrors.confirm_password = t("confirmPasswordRequiredError");
+      } else if (password !== password_confirmation) {
+        newErrors.confirm_password = t("passwordsDoNotMatchError");
+      }
+    } else {
+      if (password?.trim()) {
+        if (password.length < 6) {
+          newErrors.password = t("passwordTooShortError");
+        }
+        if (!password_confirmation?.trim()) {
+          newErrors.confirm_password = t("confirmPasswordRequiredError");
+        } else if (password !== password_confirmation) {
+          newErrors.confirm_password = t("passwordsDoNotMatchError");
+        }
+      }
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (validateForm()) {
-      // Process registration
-      login({
-        id: `student_${Date.now()}`,
-        name: formData.fullName,
-        type: "student",
-        data: formData,
-      });
+  const handleSubmit = async () => {
+    if (!validateForm()) {
+      return Alert.alert(t("dataError"), t("fillAllRequiredFields"));
+    }
 
-      Alert.alert("نجح التسجيل", "تم تسجيل الطالب بنجاح", [
-        { text: "موافق", onPress: () => router.push("/") },
-      ]);
-    } else {
-      Alert.alert("خطأ في البيانات", "يرجى ملء جميع الحقول المطلوبة");
+    setIsLoading(true);
+    try {
+      const submitData = {
+        name: formData.name,
+        phone: formData.phone,
+        ...(formData.password?.trim() && {
+          password: formData.password,
+          password_confirmation: formData.password_confirmation,
+        }),
+      } as StudentProfileRequest;
+
+      if (isEdit) {
+        await updateUser(submitData);
+        Alert.alert(t("updateSuccess"), t("studentUpdatedSuccessfully"), [
+          { text: t("ok"), onPress: () => router.back() },
+        ]);
+      } else {
+        await studentRegister({
+          name: formData.name,
+          phone: formData.phone,
+          password: formData.password,
+          password_confirmation: formData.password_confirmation,
+        });
+        Alert.alert(
+          t("registrationSuccess"),
+          t("studentRegisteredSuccessfully"),
+          [{ text: t("ok"), onPress: () => router.push("/profile") }]
+        );
+      }
+    } catch (error) {
+      console.error(
+        `Error ${isEdit ? "updating" : "registering"} student:`,
+        error
+      );
+      Alert.alert(
+        isEdit ? t("updateError") : t("registrationError"),
+        isEdit ? t("updateFailed") : t("registrationFailed")
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleCancel = () => {
-    router.back();
-  };
-
-  const EducationLevelPicker = () => (
-    <View style={styles.otherViewStyle.pickerContainer}>
-      {educationLevels.map((level, index) => (
-        <TouchableOpacity
-          key={index}
-          style={[
-            styles.otherViewStyle.pickerOption,
-            formData.educationLevel === level &&
-              styles.otherViewStyle.pickerOptionSelected,
-          ]}
-          onPress={() => handleInputChange("educationLevel", level)}
+  // لا تعرض الشاشة حتى يتم التهيئة
+  if (!isInitialized) {
+    return (
+      <SafeAreaView style={styles.homeScreen.container}>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <AppText
-            style={[
-              styles.otherViewStyle.pickerOptionText,
-              formData.educationLevel === level &&
-                styles.otherViewStyle.pickerOptionTextSelected,
-            ]}
-          >
-            {level}
-          </AppText>
-        </TouchableOpacity>
-      ))}
-    </View>
-  );
+          <ActivityIndicator size="large" color={theme.background.primary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.homeScreen.container}>
       <ScrollView style={styles.registerScreen.scrollContainer}>
         <View style={styles.registerScreen.formContainer}>
           <AppText style={styles.registerScreen.title}>
-            {t("studentRegisterationTitle")}
+            {isEdit ? t("editStudentTitle") : t("studentRegisterationTitle")}
           </AppText>
 
           <View style={styles.registerScreen.inputContainer}>
-            <AppText style={styles.registerScreen.label}>
-              {t("fullName")} *
-            </AppText>
+            <AppText style={styles.registerScreen.label}>{t("name")} *</AppText>
             <TextInput
               style={[
                 styles.registerScreen.input,
-                errors.fullName && styles.registerScreen.inputError,
+                errors.name && styles.registerScreen.inputError,
               ]}
-              value={formData.fullName}
-              onChangeText={(text) => handleInputChange("fullName", text)}
+              value={formData.name}
+              onChangeText={(text) => handleInputChange("name", text)}
               textAlign={language === "ar" ? "right" : "left"}
+              editable={!isLoading}
             />
-            {errors.fullName && (
+            {errors.name && (
               <AppText style={styles.registerScreen.errorText}>
-                {errors.fullName}
+                {errors.name}
               </AppText>
             )}
           </View>
 
           <View style={styles.registerScreen.inputContainer}>
             <AppText style={styles.registerScreen.label}>
-              {t("dateOfBirth")} *
+              {t("phone")} *
             </AppText>
             <TextInput
               style={[
                 styles.registerScreen.input,
-                errors.dateOfBirth && styles.registerScreen.inputError,
+                errors.phone && styles.registerScreen.inputError,
               ]}
-              value={formData.dateOfBirth}
-              onChangeText={(text) => handleInputChange("dateOfBirth", text)}
-              placeholder="dd/mm/yyyy"
-              keyboardType="numeric"
-              textAlign={language === "ar" ? "right" : "left"}
-            />
-            {errors.dateOfBirth && (
-              <AppText style={styles.registerScreen.errorText}>
-                {errors.dateOfBirth}
-              </AppText>
-            )}
-          </View>
-
-          <View style={styles.registerScreen.inputContainer}>
-            <AppText style={styles.registerScreen.label}>
-              {t("phoneNumber")} *
-            </AppText>
-            <TextInput
-              style={[
-                styles.registerScreen.input,
-                errors.phoneNumber && styles.registerScreen.inputError,
-              ]}
-              value={formData.phoneNumber}
-              onChangeText={(text) => handleInputChange("phoneNumber", text)}
+              value={formData.phone}
+              onChangeText={(text) => handleInputChange("phone", text)}
               keyboardType="phone-pad"
               textAlign={language === "ar" ? "right" : "left"}
+              editable={!isLoading}
             />
-            {errors.phoneNumber && (
+            {errors.phone && (
               <AppText style={styles.registerScreen.errorText}>
-                {errors.phoneNumber}
+                {errors.phone}
               </AppText>
             )}
           </View>
 
           <View style={styles.registerScreen.inputContainer}>
             <AppText style={styles.registerScreen.label}>
-              {t("parentPhoneNumber")}
-            </AppText>
-            <TextInput
-              style={styles.registerScreen.input}
-              value={formData.parentPhone}
-              onChangeText={(text) => handleInputChange("parentPhone", text)}
-              keyboardType="phone-pad"
-              textAlign={language === "ar" ? "right" : "left"}
-            />
-          </View>
-
-          <View style={styles.registerScreen.inputContainer}>
-            <AppText style={styles.registerScreen.label}>{t("email")}</AppText>
-            <TextInput
-              style={[
-                styles.registerScreen.input,
-                errors.email && styles.registerScreen.inputError,
-              ]}
-              value={formData.email}
-              onChangeText={(text) => handleInputChange("email", text)}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              textAlign={language === "ar" ? "right" : "left"}
-            />
-            {errors.email && (
-              <AppText style={styles.registerScreen.errorText}>
-                {errors.email}
-              </AppText>
-            )}
-          </View>
-
-          <View style={styles.registerScreen.inputContainer}>
-            <AppText style={styles.registerScreen.label}>
-              {t("homeAddress")} *
+              {t("password")} {isEdit && "*"}
             </AppText>
             <TextInput
               style={[
                 styles.registerScreen.input,
-                errors.address && styles.registerScreen.inputError,
+                errors.password && styles.registerScreen.inputError,
               ]}
-              value={formData.address}
-              onChangeText={(text) => handleInputChange("address", text)}
-              multiline={true}
-              numberOfLines={3}
+              value={formData.password}
+              onChangeText={(text) => handleInputChange("password", text)}
+              secureTextEntry={true}
               textAlign={language === "ar" ? "right" : "left"}
-              textAlignVertical="top"
+              editable={!isLoading}
             />
-            {errors.address && (
+            {errors.password && (
               <AppText style={styles.registerScreen.errorText}>
-                {errors.address}
+                {errors.password}
               </AppText>
             )}
           </View>
 
           <View style={styles.registerScreen.inputContainer}>
             <AppText style={styles.registerScreen.label}>
-              {t("educationLevel")} *
-            </AppText>
-            <EducationLevelPicker />
-            {errors.educationLevel && (
-              <AppText style={styles.registerScreen.errorText}>
-                {errors.educationLevel}
-              </AppText>
-            )}
-          </View>
-
-          <View style={styles.registerScreen.inputContainer}>
-            <AppText style={styles.registerScreen.label}>
-              {t("schoolName")}
-            </AppText>
-            <TextInput
-              style={styles.registerScreen.input}
-              value={formData.school}
-              onChangeText={(text) => handleInputChange("school", text)}
-              textAlign={language === "ar" ? "right" : "left"}
-            />
-          </View>
-
-          <View style={styles.registerScreen.inputContainer}>
-            <AppText style={styles.registerScreen.label}>
-              {t("nationalIdEgypt")}
+              {t("password_confirmation")} {isEdit && "*"}
             </AppText>
             <TextInput
               style={[
                 styles.registerScreen.input,
-                errors.identification && styles.registerScreen.inputError,
+                errors.confirm_password && styles.registerScreen.inputError,
               ]}
-              value={formData.nationalIdEgypt}
+              value={formData.password_confirmation}
               onChangeText={(text) =>
-                handleInputChange("nationalIdEgypt", text)
+                handleInputChange("password_confirmation", text)
               }
-              keyboardType="numeric"
+              secureTextEntry={true}
               textAlign={language === "ar" ? "right" : "left"}
+              editable={!isLoading}
             />
-          </View>
-
-          <View style={styles.registerScreen.inputContainer}>
-            <AppText style={styles.registerScreen.label}>
-              {t("residenceIdAbroad")}
-            </AppText>
-            <TextInput
-              style={[
-                styles.registerScreen.input,
-                errors.identification && styles.registerScreen.inputError,
-              ]}
-              value={formData.residenceIdAbroad}
-              onChangeText={(text) =>
-                handleInputChange("residenceIdAbroad", text)
-              }
-              textAlign={language === "ar" ? "right" : "left"}
-            />
-            {errors.identification && (
+            {errors.confirm_password && (
               <AppText style={styles.registerScreen.errorText}>
-                {errors.identification}
+                {errors.confirm_password}
               </AppText>
             )}
           </View>
 
           <View style={styles.registerScreen.buttonsContainer}>
             <PrimaryButton
-              title={t("registerButton")}
+              title={
+                isLoading
+                  ? isEdit
+                    ? t("updating")
+                    : t("registering")
+                  : isEdit
+                  ? t("updateButton")
+                  : t("registerButton")
+              }
               onPress={handleSubmit}
               theme={theme}
+              disabled={isLoading}
             />
-            <SecondaryButton
-              title={t("cancleButton")}
-              onPress={handleCancel}
-              theme={theme}
-            />
+            {isLoading && (
+              <ActivityIndicator
+                size="small"
+                color={theme.background.primary}
+              />
+            )}
           </View>
         </View>
       </ScrollView>
@@ -363,4 +297,4 @@ const StudentRegistrationScreen = () => {
   );
 };
 
-export default StudentRegistrationScreen;
+export default StudentFormScreen;

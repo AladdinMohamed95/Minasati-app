@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
 import { Modal, ScrollView, TouchableOpacity, View } from "react-native";
 
-export const ModalView = React.memo(
+const ModalView = React.memo(
   ({
     modalVisible,
     handleCancel,
@@ -105,3 +105,5 @@ export const ModalView = React.memo(
     );
   }
 );
+
+export default ModalView;

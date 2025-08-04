@@ -29,7 +29,7 @@ export const createStyles = (theme: Theme) => {
       flex: 1,
       backgroundColor: theme.background.primary,
       paddingHorizontal: 20,
-      paddingTop: Platform.OS === "ios" ? insets.top : statusBarHeight,
+      // paddingTop: Platform.OS === "ios" ? insets.top : statusBarHeight,
     } as ViewStyle,
     langText: {
       fontSize: 14,
@@ -41,7 +41,7 @@ export const createStyles = (theme: Theme) => {
     logoContainer: {
       alignItems: "center",
       justifyContent: "center",
-      marginTop: 60,
+      marginTop: 20,
       marginBottom: 40,
     } as ViewStyle,
     logoPlaceholder: {
@@ -229,11 +229,12 @@ export const createStyles = (theme: Theme) => {
     } as TextStyle,
     inputContainer: {
       marginBottom: 20,
+      textAlign: isRTL ? "right" : "left",
     } as ViewStyle,
     label: {
-      fontSize: 16,
+      fontSize: 14,
       fontWeight: "600",
-      marginBottom: 8,
+      marginBottom: 4,
       color: "#333",
       textAlign: isRTL ? "right" : "left",
       includeFontPadding: false,
@@ -246,15 +247,15 @@ export const createStyles = (theme: Theme) => {
       padding: 12,
       fontSize: 16,
       backgroundColor: "#fff",
-      minHeight: 48,
+      minHeight: 40,
       textAlign: isRTL ? "right" : "left",
       writingDirection: isRTL ? "rtl" : "ltr",
       includeFontPadding: false,
       textAlignVertical: "center",
       ...Platform.select({
         android: {
-          paddingTop: 12,
-          paddingBottom: 12,
+          paddingTop: 8,
+          paddingBottom: 8,
         },
       }),
     } as TextStyle,
@@ -263,8 +264,8 @@ export const createStyles = (theme: Theme) => {
     } as TextStyle,
     errorText: {
       color: "#ff4444",
-      fontSize: 12,
-      marginTop: 4,
+      fontSize: 10,
+      // marginTop: 4,
       textAlign: isRTL ? "right" : "left",
       includeFontPadding: false,
       textAlignVertical: "center",
@@ -338,6 +339,8 @@ export const createStyles = (theme: Theme) => {
       marginBottom: 16,
       borderWidth: 1,
       borderColor: "#e5e7eb",
+      flex: 1,
+      alignSelf: "stretch",
       ...Platform.select({
         ios: {
           shadowColor: "#000",
@@ -851,14 +854,14 @@ export const createStyles = (theme: Theme) => {
       alignItems: "center",
       justifyContent: "center",
       marginBottom: 20,
-    }as ViewStyle,
+    } as ViewStyle,
     teacherText: {
       fontSize: 16,
       color: "#7f8c8d",
       textAlign: isRTL ? "right" : "left",
       includeFontPadding: false,
       textAlignVertical: "center",
-    }as TextStyle,
+    } as TextStyle,
     teacherLink: {
       fontSize: 16,
       color: "#3498db",
@@ -866,7 +869,7 @@ export const createStyles = (theme: Theme) => {
       textAlign: isRTL ? "right" : "left",
       includeFontPadding: false,
       textAlignVertical: "center",
-    }as TextStyle,
+    } as TextStyle,
   });
 
   return {

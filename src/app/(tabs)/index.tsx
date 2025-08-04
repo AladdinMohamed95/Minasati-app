@@ -1,117 +1,69 @@
 // @ts-ignore
-import Logo from "@/assets/images/icon.png";
-import { PrimaryButton, SecondaryButton } from "@/components/AppButton";
+import { PrimaryButton } from "@/components/AppButton";
 import AppText from "@/components/AppText";
-import { LanguageSwitcher } from "@/components/PreferencesSwitcher";
 import { useTheme } from "@/context/ThemeContext";
-import { useTranslationContext } from "@/context/TranslationContext";
 import { useUser } from "@/context/UserContext";
 import { createStyles } from "@/styles";
+import { Ionicons } from "@expo/vector-icons";
 
 import { useRouter } from "expo-router";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import {
-  Image,
-  SafeAreaView,
-  StatusBar,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { SafeAreaView, StatusBar, TouchableOpacity, View } from "react-native";
 
 const HomeScreen = () => {
-  const { login } = useUser();
   const router = useRouter();
   const { t } = useTranslation();
-  const { language } = useTranslationContext();
   const { theme } = useTheme();
   const styles = createStyles(theme);
+  const { user } = useUser();
 
-  const handlePhoneRegister = () => {
-    router.push("/studentRegisteration");
+  const handleBooking = () => {
+    router.push("/booking");
   };
 
-  const handleGuestBrowse = () => {
-    login({
-      id: "guest",
-      name: "guest",
-      type: "guest",
-    });
-    router.push("/teacherScreen");
-  };
-
-  const handleTeacherSignup = () => {
-    router.push("/teacherRegister");
-  };
-
-  const handleContactUs = () => {
-    console.log("Contact us pressed");
-    router.push("/materialScreen");
+  const goToProfile = () => {
+    router.push("/profile"); // تأكد أن صفحة البروفايل موجودة في هذا المسار
   };
 
   return (
     <SafeAreaView style={styles.homeScreen.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
-      <View style={styles.preferenceContainer.preferencesContainer}>
-        <LanguageSwitcher />
-        {/* <ThemeToggle /> */}
-      </View>
       <View style={styles.homeScreen.logoContainer}>
-        <View style={styles.homeScreen.logoPlaceholder}>
-          <Image
-            source={Logo}
-            style={{ width: 100, height: 100, resizeMode: "contain" }}
-            accessibilityLabel="App Logo"
-          />
-        </View>
-      </View>
-
-      <View style={styles.homeScreen.descriptionContainer}>
-        <AppText style={styles.homeScreen.descriptionText}>{t("slug")}</AppText>
-        <AppText style={styles.homeScreen.subDescriptionText}>
-          {t("slugDesc")}
-        </AppText>
-      </View>
-
-      <PrimaryButton
-        title={t("register")}
-        onPress={handlePhoneRegister}
-        theme={theme}
-        textStyle={styles.whiteAndBlackText.whiteText}
-      />
-      <SecondaryButton
-        title={t("guest")}
-        onPress={handleGuestBrowse}
-        theme={theme}
-        textStyle={styles.whiteAndBlackText.blackText}
-      />
-
-      <View style={styles.homeScreen.footerContainer}>
-        <View
-          style={[
-            styles.otherViewStyle.teacherSignupContainer,
-            { flexDirection: language === "ar" ? "row-reverse" : "row" },
-          ]}
-        >
-          <AppText style={styles.otherViewStyle.teacherText}>
-            {t("newTeacher")}
+        <View>
+          <AppText style={styles.homeScreen.descriptionText}>
+            {t("Hello")} {user?.name || t("welcomeGuest")},
           </AppText>
-          <TouchableOpacity onPress={handleTeacherSignup}>
-            <AppText style={styles.otherViewStyle.teacherLink}>
-              {t("teacherSignup")}
-            </AppText>
-          </TouchableOpacity>
+          <AppText style={styles.registerScreen.title}>{t("welcome")}</AppText>
+          <AppText style={styles.homeScreen.descriptionText}>
+            {t("slug") || "احجز حصتك الآن بسهولة وسرعة"}
+          </AppText>
+          <AppText style={styles.homeScreen.subDescriptionText}>
+            {t("slugDesc")}
+          </AppText>
         </View>
 
         <TouchableOpacity
+          onPress={goToProfile}
           style={styles.homeScreen.contactContainer}
-          onPress={handleContactUs}
         >
-          <AppText style={styles.homeScreen.contactText}>
-            {t("contactus")}
-          </AppText>
+          <Ionicons
+            name="person-circle-outline"
+            size={40}
+            color={theme.text.primary}
+          />
         </TouchableOpacity>
+      </View>
+
+      {/* Center content */}
+      <View style={styles.homeScreen.contactContainer}>
+        <PrimaryButton
+          title={t("booknow")}
+          onPress={handleBooking}
+          theme={theme}
+          textStyle={styles.whiteAndBlackText.whiteText}
+        />
       </View>
     </SafeAreaView>
   );

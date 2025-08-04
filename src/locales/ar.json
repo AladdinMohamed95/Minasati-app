@@ -1,5 +1,7 @@
 {
-  "welcome": "مرحبًا بك في التطبيق",
+  "Hello": "أهلا",
+  "welcome": "مرحبًا بك في منصة الماسة التعليمية",
+  "welcomeGuest": "بالضيف",
   "register": "تسجيل برقم الهاتف",
   "login": "تسجيل الدخول",
   "logout": "تسجيل الخروج",
@@ -9,8 +11,37 @@
   "slugDesc": "تعلم بطريقة تفاعلية ومميزة مع نخبة من أفضل المعلمين",
   "guest": "تصفح كزائر",
   "newTeacher": "هل أنت معلم جديد؟ ",
+  "newStudent": "هل أنت طالب جديد؟ ",
   "teacherSignup": "سجل من هنا",
   "contactus": "لديك سؤال؟ اتصل بنا",
+
+  "nameError": "خطأ بالاسم",
+  "passwordRequiredError": "مطلوب ادخال كلمة السر",
+  "passwordTooShortError": "كلمة السر قصيرة جدا",
+  "confirmPasswordRequiredError": "مطلوب تأكيد كلمة السر",
+  "passwordsDoNotMatchError": "كلمة السر غير مطابقة",
+
+  "name": "الاسم",
+  "phone": "رقم الهاتف",
+  "password": "كلمة السر",
+  "password_confirmation": "تأكيد كلمة السر",
+
+  "dataError": "خطأ في البيانات",
+  "fillAllRequiredFields": "يرجى ملء جميع الحقول المطلوبة",
+  "registrationSuccess": "تم التسجيل بنجاح",
+  "studentRegisteredSuccessfully": "تم تسجيل الطالب بنجاح",
+  "registrationError": "خطأ في التسجيل",
+  "registrationFailed": "فشل في التسجيل",
+  "ok": "موافق",
+  "registering": "جاري التسجيل...",
+  "cancelButton": "إلغاء",
+  "type": "نوع المستخدم",
+  "registeredAt": "تاريخ التسجيل",
+  "edit": "تعديل البروفايل",
+  "updating": "جاري التعديل...",
+  "updateButton": "تعديل",
+
+  "loginError": "خطأ في تسجيل الدخول",
 
   "fullNameError": "الاسم الكامل مطلوب",
   "specializationError": "التخصص مطلوب",
@@ -28,6 +59,7 @@
 
   "teacherRegisterationTitle": "تسجيل معلم جديد",
   "studentRegisterationTitle": "تسجيل الطالب",
+  "editStudentTitle": "تعديل بيانات الطالب",
   "fullName": "الاسم الكامل",
   "specialization": "التخصص",
   "qualification": "المؤهل الدراسي",
@@ -68,5 +100,7 @@
     "duration": "مدة الدورة",
     "level": "مستوى الدورة",
     "explore": "استكشاف المادة"
-  }
+  },
+
+  "booknow": "احجز الان"
 }

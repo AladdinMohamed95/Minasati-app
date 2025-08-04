@@ -11,6 +11,7 @@ type Props = {
   style?: object;
   textStyle?: object;
   theme: Theme;
+  disabled?: boolean;
 };
 
 export const PrimaryButton = ({
@@ -19,6 +20,7 @@ export const PrimaryButton = ({
   style,
   textStyle,
   theme,
+  disabled,
 }: Props) => {
   const styles = createStyles(theme);
   return (
@@ -32,6 +34,7 @@ export const PrimaryButton = ({
         style={styles.appButton.primaryButton}
         onPress={onPress}
         activeOpacity={0.85}
+        disabled={disabled}
       >
         <AppText style={[styles.appButton.primaryText, textStyle]}>
           {title}
