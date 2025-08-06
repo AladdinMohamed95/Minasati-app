@@ -10,8 +10,9 @@
   "slug": "Learn with the best teachers online",
   "slugDesc": "Learn with interactive methods with a selection of the best teachers",
   "guest": "Browse as Guest",
-  "newTeacher": "Are you a new teacher? ",
-  "newStudent": "Are you a new student? ",
+  "newTeacher": "Are you a new teacher?",
+  "newStudent": "Are you a new student?",
+  "newUser": "Are you a new user?",
   "teacherSignup": "Sign up here",
   "contactus": "Do you have a question? Contact us",
 

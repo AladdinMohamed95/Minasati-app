@@ -1,150 +1,321 @@
-// @ts-ignore
-import { PrimaryButton, SecondaryButton } from "@/components/AppButton";
+import { updateProfile } from "@/api/teachersMiddlewate";
+import { PrimaryButton } from "@/components/AppButton";
 import AppText from "@/components/AppText";
+import { LoadingView } from "@/components/LoadingView";
 import { useTheme } from "@/context/ThemeContext";
 import { useTranslationContext } from "@/context/TranslationContext";
-import { formDataProps, useUser } from "@/context/UserContext";
+import { useUser } from "@/context/UserContext";
 import { createStyles } from "@/styles";
-import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { TeacherProfileRequest } from "@/types/api";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, SafeAreaView, ScrollView, TextInput, View } from "react-native";
+import {
+  Alert,
+  SafeAreaView,
+  ScrollView,
+  Switch,
+  TextInput,
+  View,
+} from "react-native";
 
-const TeacherRegistrationScreen = () => {
-  const { login } = useUser();
+const TeacherEditScreen = () => {
   const router = useRouter();
   const { t } = useTranslation();
   const { language } = useTranslationContext();
   const { theme } = useTheme();
   const styles = createStyles(theme);
+  const params = useLocalSearchParams();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const { refreshUser } = useUser();
 
-  const [formData, setFormData] = useState<
-    Pick<
-      formDataProps,
-      | "fullName"
-      | "specialization"
-      | "qualification"
-      | "yearsExperience"
-      | "currentWorkplace"
-      | "workAddress"
-      | "homeAddress"
-      | "phoneNumber"
-      | "alternatePhone"
-      | "nationalIdEgypt"
-      | "residenceIdAbroad"
-    >
-  >({
-    fullName: "",
+  const [formData, setFormData] = useState<TeacherProfileRequest>({
+    name: "",
+    password: "",
+    password_confirmation: "",
+    current_workplace: "",
     specialization: "",
-    qualification: "",
-    yearsExperience: "",
-    currentWorkplace: "",
-    workAddress: "",
-    homeAddress: "",
-    phoneNumber: "",
-    alternatePhone: "",
-    nationalIdEgypt: "",
-    residenceIdAbroad: "",
+    work_title: "",
+    phone2: "",
+    home_address: "",
+    work_address: "",
+    desc: "",
+    years_of_experience: 0,
+    national_id_egypt: "",
+    residence_number_outside_egypt: "",
+    is_online: false,
+    is_offline: false,
+    country: "",
   });
 
-  const [errors, setErrors] = useState<Partial<formDataProps>>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof TeacherProfileRequest | "confirm_password", string>>
+  >({});
 
-  const handleInputChange = (field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+  useEffect(() => {
+    if (params.teacherData && !isInitialized) {
+      try {
+        const teacherData = JSON.parse(params.teacherData as string);
 
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors((prev) => ({
-        ...prev,
-        [field]: null,
-      }));
+        setFormData({
+          name: teacherData.name || "",
+          password: "",
+          password_confirmation: "",
+          current_workplace: teacherData.profile?.workplace || "",
+          specialization: teacherData.profile?.specialization || "",
+          work_title: teacherData.profile?.title || "",
+          phone2: teacherData.phone2 || "",
+          home_address: teacherData.home_address || "",
+          work_address: teacherData.work_address || "",
+          desc: teacherData.profile?.description || "",
+          years_of_experience: teacherData.profile?.experience_years || 0,
+          national_id_egypt: teacherData.national_id_egypt || "",
+          residence_number_outside_egypt:
+            teacherData.residence_number_outside_egypt || "",
+          is_online: teacherData.availability?.online || false,
+          is_offline: teacherData.availability?.offline || false,
+          country: teacherData.profile?.country || "",
+        });
+
+        setIsInitialized(true);
+      } catch (error) {
+        console.error("Error parsing teacher data:", error);
+        setIsInitialized(true);
+      }
+    } else {
+      setIsInitialized(true);
     }
+  }, [params.teacherData, isInitialized]);
+
+  const handleInputChange = (
+    field: keyof TeacherProfileRequest,
+    value: string | number | boolean
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({
+      ...prev,
+      [field === "password_confirmation" ? "confirm_password" : field]:
+        undefined,
+    }));
   };
 
   const validateForm = () => {
-    const newErrors: Partial<formDataProps> = {};
+    const newErrors: Partial<
+      Record<keyof TeacherProfileRequest | "confirm_password", string>
+    > = {};
 
-    if (!formData.fullName.trim()) newErrors.fullName = t("fullNameError");
-    if (!formData.specialization.trim())
-      newErrors.specialization = t("specializationError");
-    if (!formData.qualification.trim())
-      newErrors.qualification = t("qualificationError");
-    if (!formData.yearsExperience.trim())
-      newErrors.yearsExperience = t("yearsExperienceError");
-    if (!formData.currentWorkplace.trim())
-      newErrors.currentWorkplace = t("currentWorkplaceError");
-    if (!formData.workAddress.trim())
-      newErrors.workAddress = t("workAddressError");
-    if (!formData.homeAddress.trim())
-      newErrors.homeAddress = t("homeAddressError");
-    if (!formData.phoneNumber.trim())
-      newErrors.phoneNumber = t("phoneNumberError");
+    // الحقول المطلوبة
+    if (!formData.name?.trim()) newErrors.name = t("nameError");
+    if (!formData.specialization?.trim())
+      newErrors.specialization = t("specializationRequiredError");
+    if (!formData.work_title?.trim())
+      newErrors.work_title = t("workTitleRequiredError");
 
-    // Either Egyptian national ID or abroad residence ID is required
+    // التحقق من كلمة المرور إذا تم إدخالها
+    if (formData.password?.trim()) {
+      if (formData.password.length < 6) {
+        newErrors.password = t("passwordTooShortError");
+      }
+      if (!formData.password_confirmation?.trim()) {
+        newErrors.confirm_password = t("confirmPasswordRequiredError");
+      } else if (formData.password !== formData.password_confirmation) {
+        newErrors.confirm_password = t("passwordsDoNotMatchError");
+      }
+    }
+
+    // التحقق من سنوات الخبرة
+    if (formData.years_of_experience) {
+      const years = formData.years_of_experience;
+      if (isNaN(years) || years < 0) {
+        newErrors.years_of_experience = t("yearsOfExperienceError");
+      }
+    }
+
+    // التحقق من الرقم القومي أو رقم الإقامة
     if (
-      !formData?.nationalIdEgypt?.trim() &&
-      !formData?.residenceIdAbroad?.trim()
+      !formData.national_id_egypt?.trim() &&
+      !formData.residence_number_outside_egypt?.trim()
     ) {
-      newErrors.identification = t("identificationError");
+      newErrors.national_id_egypt = t("nationalIdOrResidenceRequiredError");
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (validateForm()) {
-      // Process registration
-      login({
-        id: `teacher_${Date.now()}`,
-        name: formData.fullName,
-        type: "teacher",
-        data: formData,
-      });
+  const handleSubmit = async () => {
+    if (!validateForm()) {
+      return Alert.alert(t("dataError"), t("fillAllRequiredFields"));
+    }
 
-      Alert.alert("نجح التسجيل", "تم تسجيل المعلم بنجاح", [
-        { text: "موافق", onPress: () => router.push("/home") },
+    setIsLoading(true);
+    try {
+      const submitData: Partial<TeacherProfileRequest> = {
+        name: formData.name,
+        current_workplace: formData.current_workplace,
+        specialization: formData.specialization,
+        country: formData.country,
+        work_title: formData.work_title,
+        phone2: formData.phone2,
+        home_address: formData.home_address,
+        work_address: formData.work_address,
+        desc: formData.desc,
+        years_of_experience: formData.years_of_experience
+          ? formData.years_of_experience
+          : 0,
+        national_id_egypt: formData.national_id_egypt,
+        residence_number_outside_egypt: formData.residence_number_outside_egypt,
+        is_online: formData.is_online,
+        is_offline: formData.is_offline,
+        ...(formData.password?.trim() && {
+          password: formData.password,
+          password_confirmation: formData.password_confirmation,
+        }),
+      };
+
+      await updateProfile(submitData as TeacherProfileRequest);
+      await refreshUser();
+      Alert.alert(t("updateSuccess"), t("teacherUpdatedSuccessfully"), [
+        {
+          text: t("ok"),
+          onPress: () => {
+            router.replace({
+              pathname: "/(tabs)/teacherProfile",
+              params: { refresh: "true" },
+            });
+          },
+        },
       ]);
-    } else {
-      Alert.alert("خطأ في البيانات", "يرجى ملء جميع الحقول المطلوبة");
+    } catch (error) {
+      console.error("Error updating teacher:", error);
+      Alert.alert(t("updateError"), t("updateFailed"));
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleCancel = () => {
-    router.back();
-  };
+  if (!isInitialized) {
+    return (
+      <SafeAreaView style={styles.homeScreen.container}>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <LoadingView isLoading={true} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.homeScreen.container}>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <LoadingView isLoading={isLoading} />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.homeScreen.container}>
       <ScrollView style={styles.registerScreen.scrollContainer}>
         <View style={styles.registerScreen.formContainer}>
           <AppText style={styles.registerScreen.title}>
-            {t("teacherRegisterationTitle")}
+            {t("editTeacherTitle")}
           </AppText>
 
+          {/* البيانات الأساسية */}
           <View style={styles.registerScreen.inputContainer}>
-            <AppText style={styles.registerScreen.label}>
-              {t("fullName")} *
-            </AppText>
+            <AppText style={styles.registerScreen.label}>{t("name")} *</AppText>
             <TextInput
               style={[
                 styles.registerScreen.input,
-                errors.fullName && styles.registerScreen.inputError,
+                errors.name && styles.registerScreen.inputError,
               ]}
-              value={formData.fullName}
-              onChangeText={(text) => handleInputChange("fullName", text)}
+              value={formData.name}
+              onChangeText={(text) => handleInputChange("name", text)}
               textAlign={language === "ar" ? "right" : "left"}
+              editable={!isLoading}
             />
-            {errors.fullName && (
+            {errors.name && (
               <AppText style={styles.registerScreen.errorText}>
-                {errors.fullName}
+                {errors.name}
               </AppText>
             )}
           </View>
 
+          <View style={styles.registerScreen.inputContainer}>
+            <AppText style={styles.registerScreen.label}>{t("phone2")}</AppText>
+            <TextInput
+              style={[
+                styles.registerScreen.input,
+                errors.phone2 && styles.registerScreen.inputError,
+              ]}
+              value={formData.phone2}
+              onChangeText={(text) => handleInputChange("phone2", text)}
+              keyboardType="phone-pad"
+              textAlign={language === "ar" ? "right" : "left"}
+              editable={!isLoading}
+            />
+            {errors.phone2 && (
+              <AppText style={styles.registerScreen.errorText}>
+                {errors.phone2}
+              </AppText>
+            )}
+          </View>
+
+          {/* كلمة المرور */}
+          <View style={styles.registerScreen.inputContainer}>
+            <AppText style={styles.registerScreen.label}>
+              {t("password")}
+            </AppText>
+            <TextInput
+              style={[
+                styles.registerScreen.input,
+                errors.password && styles.registerScreen.inputError,
+              ]}
+              value={formData.password}
+              onChangeText={(text) => handleInputChange("password", text)}
+              secureTextEntry={true}
+              textAlign={language === "ar" ? "right" : "left"}
+              editable={!isLoading}
+              placeholder={t("leaveEmptyToKeepCurrent")}
+            />
+            {errors.password && (
+              <AppText style={styles.registerScreen.errorText}>
+                {errors.password}
+              </AppText>
+            )}
+          </View>
+
+          <View style={styles.registerScreen.inputContainer}>
+            <AppText style={styles.registerScreen.label}>
+              {t("password_confirmation")}
+            </AppText>
+            <TextInput
+              style={[
+                styles.registerScreen.input,
+                errors.confirm_password && styles.registerScreen.inputError,
+              ]}
+              value={formData.password_confirmation}
+              onChangeText={(text) =>
+                handleInputChange("password_confirmation", text)
+              }
+              secureTextEntry={true}
+              textAlign={language === "ar" ? "right" : "left"}
+              editable={!isLoading}
+            />
+            {errors.confirm_password && (
+              <AppText style={styles.registerScreen.errorText}>
+                {errors.confirm_password}
+              </AppText>
+            )}
+          </View>
+
+          {/* البيانات المهنية */}
           <View style={styles.registerScreen.inputContainer}>
             <AppText style={styles.registerScreen.label}>
               {t("specialization")} *
@@ -157,6 +328,7 @@ const TeacherRegistrationScreen = () => {
               value={formData.specialization}
               onChangeText={(text) => handleInputChange("specialization", text)}
               textAlign={language === "ar" ? "right" : "left"}
+              editable={!isLoading}
             />
             {errors.specialization && (
               <AppText style={styles.registerScreen.errorText}>
@@ -167,199 +339,224 @@ const TeacherRegistrationScreen = () => {
 
           <View style={styles.registerScreen.inputContainer}>
             <AppText style={styles.registerScreen.label}>
-              {t("qualification")} *
+              {t("workTitle")} *
             </AppText>
             <TextInput
               style={[
                 styles.registerScreen.input,
-                errors.qualification && styles.registerScreen.inputError,
+                errors.work_title && styles.registerScreen.inputError,
               ]}
-              value={formData.qualification}
-              onChangeText={(text) => handleInputChange("qualification", text)}
+              value={formData.work_title}
+              onChangeText={(text) => handleInputChange("work_title", text)}
               textAlign={language === "ar" ? "right" : "left"}
+              editable={!isLoading}
             />
-            {errors.qualification && (
+            {errors.work_title && (
               <AppText style={styles.registerScreen.errorText}>
-                {errors.qualification}
+                {errors.work_title}
               </AppText>
             )}
           </View>
 
           <View style={styles.registerScreen.inputContainer}>
             <AppText style={styles.registerScreen.label}>
-              {t("yearsExperience")} *
+              {t("currentWorkplace")}
             </AppText>
             <TextInput
               style={[
                 styles.registerScreen.input,
-                errors.yearsExperience && styles.registerScreen.inputError,
+                errors.current_workplace && styles.registerScreen.inputError,
               ]}
-              value={formData.yearsExperience}
+              value={formData.current_workplace}
               onChangeText={(text) =>
-                handleInputChange("yearsExperience", text)
+                handleInputChange("current_workplace", text)
+              }
+              textAlign={language === "ar" ? "right" : "left"}
+              editable={!isLoading}
+            />
+            {errors.current_workplace && (
+              <AppText style={styles.registerScreen.errorText}>
+                {errors.current_workplace}
+              </AppText>
+            )}
+          </View>
+
+          <View style={styles.registerScreen.inputContainer}>
+            <AppText style={styles.registerScreen.label}>
+              {t("yearsOfExperience")}
+            </AppText>
+            <TextInput
+              style={[
+                styles.registerScreen.input,
+                errors.years_of_experience && styles.registerScreen.inputError,
+              ]}
+              value={String(formData.years_of_experience ?? "")}
+              onChangeText={(text) =>
+                handleInputChange("years_of_experience", text)
               }
               keyboardType="numeric"
               textAlign={language === "ar" ? "right" : "left"}
+              editable={!isLoading}
             />
-            {errors.yearsExperience && (
+            {errors.years_of_experience && (
               <AppText style={styles.registerScreen.errorText}>
-                {errors.yearsExperience}
+                {errors.years_of_experience}
               </AppText>
             )}
           </View>
 
+          {/* العناوين */}
           <View style={styles.registerScreen.inputContainer}>
             <AppText style={styles.registerScreen.label}>
-              {t("currentWorkplace")} *
+              {t("homeAddress")}
             </AppText>
             <TextInput
               style={[
                 styles.registerScreen.input,
-                errors.currentWorkplace && styles.registerScreen.inputError,
+                errors.home_address && styles.registerScreen.inputError,
               ]}
-              value={formData.currentWorkplace}
-              onChangeText={(text) =>
-                handleInputChange("currentWorkplace", text)
-              }
+              value={formData.home_address}
+              onChangeText={(text) => handleInputChange("home_address", text)}
               textAlign={language === "ar" ? "right" : "left"}
-            />
-            {errors.currentWorkplace && (
-              <AppText style={styles.registerScreen.errorText}>
-                {errors.currentWorkplace}
-              </AppText>
-            )}
-          </View>
-
-          <View style={styles.registerScreen.inputContainer}>
-            <AppText style={styles.registerScreen.label}>
-              {t("workAddress")} *
-            </AppText>
-            <TextInput
-              style={[
-                styles.registerScreen.input,
-                errors.workAddress && styles.registerScreen.inputError,
-              ]}
-              value={formData.workAddress}
-              onChangeText={(text) => handleInputChange("workAddress", text)}
+              editable={!isLoading}
               multiline={true}
               numberOfLines={3}
-              textAlign={language === "ar" ? "right" : "left"}
-              textAlignVertical="top"
             />
-            {errors.workAddress && (
+            {errors.home_address && (
               <AppText style={styles.registerScreen.errorText}>
-                {errors.workAddress}
+                {errors.home_address}
               </AppText>
             )}
           </View>
 
           <View style={styles.registerScreen.inputContainer}>
             <AppText style={styles.registerScreen.label}>
-              {t("homeAddress")} *
+              {t("workAddress")}
             </AppText>
             <TextInput
               style={[
                 styles.registerScreen.input,
-                errors.homeAddress && styles.registerScreen.inputError,
+                errors.work_address && styles.registerScreen.inputError,
               ]}
-              value={formData.homeAddress}
-              onChangeText={(text) => handleInputChange("homeAddress", text)}
+              value={formData.work_address}
+              onChangeText={(text) => handleInputChange("work_address", text)}
+              textAlign={language === "ar" ? "right" : "left"}
+              editable={!isLoading}
               multiline={true}
               numberOfLines={3}
-              textAlign={language === "ar" ? "right" : "left"}
-              textAlignVertical="top"
             />
-            {errors.homeAddress && (
+            {errors.work_address && (
               <AppText style={styles.registerScreen.errorText}>
-                {errors.homeAddress}
+                {errors.work_address}
               </AppText>
             )}
           </View>
 
+          {/* الوصف */}
           <View style={styles.registerScreen.inputContainer}>
             <AppText style={styles.registerScreen.label}>
-              {t("phoneNumber")} *
+              {t("description")}
             </AppText>
             <TextInput
               style={[
                 styles.registerScreen.input,
-                errors.phoneNumber && styles.registerScreen.inputError,
+                errors.desc && styles.registerScreen.inputError,
+                { minHeight: 80 },
               ]}
-              value={formData.phoneNumber}
-              onChangeText={(text) => handleInputChange("phoneNumber", text)}
-              keyboardType="phone-pad"
+              value={formData.desc}
+              onChangeText={(text) => handleInputChange("desc", text)}
               textAlign={language === "ar" ? "right" : "left"}
+              editable={!isLoading}
+              multiline={true}
+              numberOfLines={4}
             />
-            {errors.phoneNumber && (
+            {errors.desc && (
               <AppText style={styles.registerScreen.errorText}>
-                {errors.phoneNumber}
+                {errors.desc}
               </AppText>
             )}
           </View>
 
+          {/* أرقام الهوية */}
           <View style={styles.registerScreen.inputContainer}>
             <AppText style={styles.registerScreen.label}>
-              {t("alternatePhone")}
-            </AppText>
-            <TextInput
-              style={styles.registerScreen.input}
-              value={formData.alternatePhone}
-              onChangeText={(text) => handleInputChange("alternatePhone", text)}
-              keyboardType="phone-pad"
-              textAlign={language === "ar" ? "right" : "left"}
-            />
-          </View>
-
-          <View style={styles.registerScreen.inputContainer}>
-            <AppText style={styles.registerScreen.label}>
-              {t("identificationNumber")}
+              {t("nationalIdEgypt")}
             </AppText>
             <TextInput
               style={[
                 styles.registerScreen.input,
-                errors.identification && styles.registerScreen.inputError,
+                errors.national_id_egypt && styles.registerScreen.inputError,
               ]}
-              value={formData.nationalIdEgypt}
+              value={formData.national_id_egypt}
               onChangeText={(text) =>
-                handleInputChange("nationalIdEgypt", text)
+                handleInputChange("national_id_egypt", text)
               }
               keyboardType="numeric"
               textAlign={language === "ar" ? "right" : "left"}
+              editable={!isLoading}
             />
+            {errors.national_id_egypt && (
+              <AppText style={styles.registerScreen.errorText}>
+                {errors.national_id_egypt}
+              </AppText>
+            )}
           </View>
 
           <View style={styles.registerScreen.inputContainer}>
             <AppText style={styles.registerScreen.label}>
-              {t("residenceIdAbroad")}
+              {t("residenceNumberOutsideEgypt")}
             </AppText>
             <TextInput
               style={[
                 styles.registerScreen.input,
-                errors.identification && styles.registerScreen.inputError,
+                errors.residence_number_outside_egypt &&
+                  styles.registerScreen.inputError,
               ]}
-              value={formData.residenceIdAbroad}
+              value={formData.residence_number_outside_egypt}
               onChangeText={(text) =>
-                handleInputChange("residenceIdAbroad", text)
+                handleInputChange("residence_number_outside_egypt", text)
               }
               textAlign={language === "ar" ? "right" : "left"}
+              editable={!isLoading}
             />
-            {errors.identification && (
+            {errors.residence_number_outside_egypt && (
               <AppText style={styles.registerScreen.errorText}>
-                {errors.identification}
+                {errors.residence_number_outside_egypt}
               </AppText>
             )}
+          </View>
+
+          {/* خيارات التدريس */}
+          <View style={styles.homeScreen.signupContainer}>
+            <AppText style={styles.registerScreen.label}>
+              {t("onlineTeaching")}
+            </AppText>
+            <Switch
+              value={formData.is_online}
+              onValueChange={(value) => handleInputChange("is_online", value)}
+              thumbColor={formData.is_online ? "#fff" : "#f4f3f4"}
+              trackColor={{ false: "#767577", true: "#81b0ff" }}
+            />
+          </View>
+
+          <View style={styles.homeScreen.signupContainer}>
+            <AppText style={styles.registerScreen.label}>
+              {t("offlineTeaching")}
+            </AppText>
+            <Switch
+              value={formData.is_offline}
+              onValueChange={(value) => handleInputChange("is_offline", value)}
+              thumbColor={formData.is_offline ? "#fff" : "#f4f3f4"}
+              trackColor={{ false: "#767577", true: "#81b0ff" }}
+            />
           </View>
 
           <View style={styles.registerScreen.buttonsContainer}>
             <PrimaryButton
-              title={t("register")}
+              title={isLoading ? t("updating") : t("updateButton")}
               onPress={handleSubmit}
               theme={theme}
-            />
-            <SecondaryButton
-              title={t("cancel")}
-              onPress={handleCancel}
-              theme={theme}
+              disabled={isLoading}
             />
           </View>
         </View>
@@ -368,4 +565,4 @@ const TeacherRegistrationScreen = () => {
   );
 };
 
-export default TeacherRegistrationScreen;
+export default TeacherEditScreen;

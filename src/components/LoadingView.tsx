@@ -7,7 +7,7 @@ export const LoadingView: React.FC<{
   return (
     <View style={styles.overlay}>
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FFFFFF" />\
+        <ActivityIndicator size="large" color="#FFFFFF" />
       </View>
     </View>
   );

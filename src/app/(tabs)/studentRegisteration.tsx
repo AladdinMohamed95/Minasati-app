@@ -1,21 +1,21 @@
-// @ts-ignore
-import { studentRegister } from "@/api/auth";
+import { studentRegister, teacherRegister } from "@/api/auth";
 import { PrimaryButton } from "@/components/AppButton";
 import AppText from "@/components/AppText";
+import { LoadingView } from "@/components/LoadingView";
 import { useTheme } from "@/context/ThemeContext";
 import { useTranslationContext } from "@/context/TranslationContext";
 import { useUser } from "@/context/UserContext";
 import { createStyles } from "@/styles";
-import { StudentProfileRequest } from "@/types/api";
+import { RegisterRequest, UserType } from "@/types/api"; // إضافة UserType
 import { formDataProps } from "@/types/types";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
   Alert,
   SafeAreaView,
   ScrollView,
+  Switch,
   TextInput,
   View,
 } from "react-native";
@@ -29,6 +29,9 @@ const StudentFormScreen = () => {
   const params = useLocalSearchParams();
   const isEdit = params.mode === "edit";
   const { updateUser } = useUser();
+  const [isEnabled, setIsEnabled] = useState(true); // true = طالب, false = معلم
+  const [isLoading, setIsLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const [formData, setFormData] = useState<
     Pick<formDataProps, "name" | "phone" | "password" | "password_confirmation">
@@ -42,10 +45,7 @@ const StudentFormScreen = () => {
   const [errors, setErrors] = useState<
     Partial<Record<"name" | "phone" | "password" | "confirm_password", string>>
   >({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
 
-  // حل أكتر فعالية: استخدم useEffect مرة واحدة فقط عند mount
   useEffect(() => {
     if (isEdit && params.studentData && !isInitialized) {
       try {
@@ -127,7 +127,7 @@ const StudentFormScreen = () => {
           password: formData.password,
           password_confirmation: formData.password_confirmation,
         }),
-      } as StudentProfileRequest;
+      } as RegisterRequest;
 
       if (isEdit) {
         await updateUser(submitData);
@@ -135,21 +135,46 @@ const StudentFormScreen = () => {
           { text: t("ok"), onPress: () => router.back() },
         ]);
       } else {
-        await studentRegister({
-          name: formData.name,
-          phone: formData.phone,
-          password: formData.password,
-          password_confirmation: formData.password_confirmation,
-        });
-        Alert.alert(
-          t("registrationSuccess"),
-          t("studentRegisteredSuccessfully"),
-          [{ text: t("ok"), onPress: () => router.push("/profile") }]
-        );
+        // تحديد نوع المستخدم بناءً على حالة Switch
+        if (isEnabled) {
+          // تسجيل طالب
+          await studentRegister(
+            {
+              name: formData.name,
+              phone: formData.phone,
+              password: formData.password,
+              password_confirmation: formData.password_confirmation,
+            },
+            UserType.student
+          ); // إضافة UserType
+          Alert.alert(
+            t("registrationSuccess"),
+            t("studentRegisteredSuccessfully"),
+            [{ text: t("ok"), onPress: () => router.push("/(tabs)/profile") }]
+          );
+        } else {
+          // تسجيل معلم
+          await teacherRegister(
+            {
+              name: formData.name,
+              phone: formData.phone,
+              password: formData.password,
+              password_confirmation: formData.password_confirmation,
+            },
+            UserType.teacher
+          ); // إضافة UserType
+          Alert.alert(
+            t("registrationSuccess"),
+            t("teacherRegisteredSuccessfully"),
+            [{ text: t("ok"), onPress: () => router.push("/(tabs)/profile") }]
+          );
+        }
       }
     } catch (error) {
       console.error(
-        `Error ${isEdit ? "updating" : "registering"} student:`,
+        `Error ${isEdit ? "updating" : "registering"} ${
+          isEnabled ? "student" : "teacher"
+        }:`,
         error
       );
       Alert.alert(
@@ -161,14 +186,25 @@ const StudentFormScreen = () => {
     }
   };
 
-  // لا تعرض الشاشة حتى يتم التهيئة
   if (!isInitialized) {
     return (
       <SafeAreaView style={styles.homeScreen.container}>
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <ActivityIndicator size="large" color={theme.background.primary} />
+          <LoadingView isLoading={isLoading} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.homeScreen.container}>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <LoadingView isLoading={isLoading} />
         </View>
       </SafeAreaView>
     );
@@ -178,9 +214,27 @@ const StudentFormScreen = () => {
     <SafeAreaView style={styles.homeScreen.container}>
       <ScrollView style={styles.registerScreen.scrollContainer}>
         <View style={styles.registerScreen.formContainer}>
-          <AppText style={styles.registerScreen.title}>
-            {isEdit ? t("editStudentTitle") : t("studentRegisterationTitle")}
-          </AppText>
+          {isEdit ? (
+            <AppText style={styles.registerScreen.title}>
+              {t("editUserTitle")}
+            </AppText>
+          ) : (
+            <AppText style={styles.registerScreen.title}>
+              {t("userRegisterationTitle")}
+            </AppText>
+          )}
+
+          <View style={styles.homeScreen.signupContainer}>
+            <AppText style={styles.registerScreen.label}>
+              {isEnabled ? "طالب" : "معلم"}
+            </AppText>
+            <Switch
+              value={isEnabled}
+              onValueChange={setIsEnabled}
+              thumbColor={isEnabled ? "#fff" : "#f4f3f4"}
+              trackColor={{ false: "#767577", true: "#81b0ff" }}
+            />
+          </View>
 
           <View style={styles.registerScreen.inputContainer}>
             <AppText style={styles.registerScreen.label}>{t("name")} *</AppText>
@@ -284,12 +338,6 @@ const StudentFormScreen = () => {
               theme={theme}
               disabled={isLoading}
             />
-            {isLoading && (
-              <ActivityIndicator
-                size="small"
-                color={theme.background.primary}
-              />
-            )}
           </View>
         </View>
       </ScrollView>

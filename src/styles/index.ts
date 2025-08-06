@@ -115,6 +115,18 @@ export const createStyles = (theme: Theme) => {
       includeFontPadding: false,
       textAlignVertical: "center",
     } as TextStyle,
+    profileIcon: {
+      position: "absolute",
+      top: 10,
+      right: 10,
+      zIndex: 10,
+    } as ViewStyle,
+    iconContainer: {
+      position: "absolute",
+      top: 10,
+      right: 10,
+      zIndex: 10,
+    } as ViewStyle,
   });
 
   const appButtonStyles = StyleSheet.create({
@@ -872,6 +884,85 @@ export const createStyles = (theme: Theme) => {
     } as TextStyle,
   });
 
+  const profileStyles = StyleSheet.create({
+    scrollContainer: {
+      padding: 16,
+    },
+    imageContainer: {
+      alignItems: "center",
+      marginBottom: 16,
+    },
+    profileImage: {
+      width: 120,
+      height: 120,
+      borderRadius: 60,
+      borderWidth: 2,
+      borderColor: "#ccc",
+    },
+    changeImageText: {
+      marginTop: 8,
+      color: "#666",
+      fontSize: 14,
+    },
+    headerContainer: {
+      flexDirection: isRTL ? "row-reverse" : "row",
+      justifyContent: "center",
+      alignItems: "center",
+      marginBottom: 24,
+    },
+    greetingText: {
+      fontSize: 22,
+      marginRight: 8,
+    },
+    languageContainer: {
+      marginBottom: 16,
+      alignItems: "flex-end",
+    },
+    card: {
+      backgroundColor: "#fff",
+      borderRadius: 10,
+      padding: 16,
+      marginBottom: 16,
+      shadowColor: "#000",
+      shadowOpacity: 0.05,
+      shadowRadius: 6,
+      elevation: 2,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      marginBottom: 12,
+      color: "#333",
+      textAlign: isRTL ? "right" : "left",
+    },
+    row: {
+      flexDirection: isRTL ? "row-reverse" : "row",
+      justifyContent: "space-between",
+      marginBottom: 8,
+      borderBottomWidth: 1,
+      borderBottomColor: "#eee",
+      paddingBottom: 4,
+    },
+    label: {
+      fontSize: 14,
+      color: "#666",
+    },
+    value: {
+      fontSize: 14,
+      color: "#333",
+    },
+    editButton: {
+      marginBottom: 16,
+      padding: 12,
+      borderRadius: 8,
+      backgroundColor: "#007bff",
+      alignItems: "center",
+    },
+    editButtonText: {
+      color: "#fff",
+      fontSize: 16,
+    },
+  });
+
   return {
     //----------------------------------------------------------------------------------------------------------home screen
     homeScreen: homeScreenStyles,
@@ -893,5 +984,7 @@ export const createStyles = (theme: Theme) => {
     loadingView: loadingViewStyles,
     //----------------------------------------------------------------------------------------------------------other view
     otherViewStyle: otherViewStyles,
+
+    profileViewStyles: profileStyles,
   };
 };

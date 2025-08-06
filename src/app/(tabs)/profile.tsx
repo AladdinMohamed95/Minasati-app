@@ -12,7 +12,9 @@ import { useTranslation } from "react-i18next";
 import {
   Image,
   SafeAreaView,
+  ScrollView,
   StatusBar,
+  StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -24,9 +26,10 @@ const ProfileScreen = () => {
   const { theme } = useTheme();
   const styles = createStyles(theme);
 
-  const handleLogout = () => {
-    logout();
-    router.push("/");
+  const handleLogout = async () => {
+    logout().then(() => {
+      router.push("/");
+    });
   };
 
   const editProfile = () => {
@@ -41,57 +44,61 @@ const ProfileScreen = () => {
 
   return (
     <SafeAreaView style={styles.homeScreen.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      <View style={styles.homeScreen.logoContainer}>
-        <View style={styles.homeScreen.logoPlaceholder}>
+      <ScrollView contentContainerStyle={styles.profileViewStyles.scrollContainer}>
+        <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+
+        {/* صورة البروفايل */}
+        <View style={styles.profileViewStyles.imageContainer}>
           <Image
             source={Logo}
-            style={{ width: 80, height: 80, resizeMode: "contain" }}
+            style={styles.profileViewStyles.profileImage}
             accessibilityLabel="Profile Avatar"
           />
         </View>
-      </View>
 
-      <View style={styles.homeScreen.descriptionContainer}>
-        <AppText style={styles.registerScreen.label}>
-          {t("Hello")}, {user?.name}
-        </AppText>
-        <HelloWave />
-      </View>
-
-      {/* Language Switcher */}
-      <View style={styles.preferenceContainer.preferencesContainer}>
-        <LanguageSwitcher />
-      </View>
-
-      <View style={styles.registerScreen.inputContainer}>
-        <View style={{ marginBottom: 16 }}>
-          <AppText style={styles.registerScreen.label}>
-            {t("phone")}: {user?.phone}
+        {/* الترحيب */}
+        <View style={styles.profileViewStyles.headerContainer}>
+          <AppText style={styles.profileViewStyles.greetingText}>
+            {t("Hello")}, {user?.name}
           </AppText>
-          <AppText style={styles.registerScreen.label}>
-            {t("type")}: {user?.type}
-          </AppText>
-          <AppText style={styles.registerScreen.label}>
-            {t("registeredAt")}: {user?.registered_at}
-          </AppText>
+          <HelloWave />
         </View>
 
-        <TouchableOpacity onPress={editProfile}>
-          <AppText
-            style={[styles.otherViewStyle.teacherLink, { fontWeight: "bold" }]}
-          >
-            {t("edit")}
-          </AppText>
-        </TouchableOpacity>
-      </View>
+        {/* تبديل اللغة */}
+        <View style={styles.profileViewStyles.languageContainer}>
+          <LanguageSwitcher />
+        </View>
 
-      <SecondaryButton
-        title={t("logout")}
-        onPress={handleLogout}
-        theme={theme}
-        textStyle={styles.whiteAndBlackText.blackText}
-      />
+        {/* بيانات الطالب */}
+        <View style={styles.profileViewStyles.card}>
+          <AppText style={styles.profileViewStyles.sectionTitle}>معلومات الحساب</AppText>
+          <View style={styles.profileViewStyles.row}>
+            <AppText style={styles.profileViewStyles.label}>{t("phone")}</AppText>
+            <AppText style={styles.profileViewStyles.value}>{user?.phone}</AppText>
+          </View>
+          <View style={styles.profileViewStyles.row}>
+            <AppText style={styles.profileViewStyles.label}>{t("type")}</AppText>
+            <AppText style={styles.profileViewStyles.value}>{user?.type}</AppText>
+          </View>
+          <View style={styles.profileViewStyles.row}>
+            <AppText style={styles.profileViewStyles.label}>{t("registeredAt")}</AppText>
+            <AppText style={styles.profileViewStyles.value}>{user?.registered_at}</AppText>
+          </View>
+        </View>
+
+        {/* زر تعديل */}
+        <TouchableOpacity onPress={editProfile} style={styles.profileViewStyles.editButton}>
+          <AppText style={styles.profileViewStyles.editButtonText}>{t("edit")}</AppText>
+        </TouchableOpacity>
+
+        {/* زر تسجيل الخروج */}
+        <SecondaryButton
+          title={t("logout")}
+          onPress={handleLogout}
+          theme={theme}
+          textStyle={styles.whiteAndBlackText.blackText}
+        />
+      </ScrollView>
     </SafeAreaView>
   );
 };

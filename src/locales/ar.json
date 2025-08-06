@@ -12,6 +12,7 @@
   "guest": "تصفح كزائر",
   "newTeacher": "هل أنت معلم جديد؟ ",
   "newStudent": "هل أنت طالب جديد؟ ",
+  "newUser": "هل أنت مستخدم جديد؟ ",
   "teacherSignup": "سجل من هنا",
   "contactus": "لديك سؤال؟ اتصل بنا",
 
@@ -60,6 +61,8 @@
   "teacherRegisterationTitle": "تسجيل معلم جديد",
   "studentRegisterationTitle": "تسجيل الطالب",
   "editStudentTitle": "تعديل بيانات الطالب",
+  "userRegisterationTitle": "تسجيل المستخدم",
+  "editUserTitle": "تعديل بيانات المستخدم",
   "fullName": "الاسم الكامل",
   "specialization": "التخصص",
   "qualification": "المؤهل الدراسي",

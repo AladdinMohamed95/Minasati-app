@@ -1,16 +1,17 @@
 // app/_layout.tsx
 import { ErrorHandler } from "@/components/ErrorHandler";
+import { LoadingView } from "@/components/LoadingView";
 import { LoadinggProvider } from "@/context/LoadingContext";
 import { ThemeProvider, useTheme } from "@/context/ThemeContext";
 import { TranslationProvider } from "@/context/TranslationContext";
-import { UserProvider, useUser } from "@/context/UserContext";
+import { UserProvider } from "@/context/UserContext";
 import { useFonts } from "@/hooks/useFonts";
 import { createStyles } from "@/styles";
 import { ConfigureRTL } from "@/utils";
-import { Stack, useRouter } from "expo-router";
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect } from "react";
-import { ActivityIndicator, Platform, View } from "react-native";
+import React from "react";
+import { Platform } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 // This component handles the status bar based on theme
@@ -35,33 +36,11 @@ const RootLayoutNav: React.FC = () => {
   const [fontsLoaded] = useFonts();
   const { theme } = useTheme();
   const styles = createStyles(theme);
-  const { isLoading, isInitializing, login, user } = useUser();
-  const router = useRouter();
 
   ConfigureRTL();
 
-  useEffect(() => {
-    if (fontsLoaded && !isLoading && !isInitializing) {
-      if (user?.id) {
-        router.replace("/");
-      } else {
-        router.replace("/loginScreen");
-      }
-    }
-  }, [fontsLoaded, isLoading, isInitializing, user?.id]);
-
-  if (!fontsLoaded || isLoading || isInitializing) {
-    return (
-      <View
-        style={[
-          styles.loadingView.loadingContainer,
-          { backgroundColor: theme.background.primary },
-        ]}
-      >
-        <ThemedStatusBar />
-        <ActivityIndicator size="large" />
-      </View>
-    );
+  if (!fontsLoaded) {
+    return <LoadingView isLoading />;
   }
 
   return (
@@ -82,7 +61,6 @@ const RootLayoutNav: React.FC = () => {
         >
           <Stack.Screen name="index" />
           <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="loginScreen" />
         </Stack>
       </SafeAreaView>
     </>
@@ -90,30 +68,11 @@ const RootLayoutNav: React.FC = () => {
 };
 
 const ThemedLoading: React.FC = React.memo(() => {
-  const { theme } = useTheme();
-  const styles = createStyles(theme);
-  return (
-    <View
-      style={[
-        styles.loadingView.loadingWrapper,
-        { backgroundColor: theme.background.primary },
-      ]}
-    >
-      <ThemedStatusBar />
-      <ActivityIndicator size="large" color={theme.text.primary} />
-    </View>
-  );
+  return <LoadingView isLoading />;
 });
 
 const FallBack: React.FC = React.memo(() => {
-  const { theme } = useTheme();
-  const styles = createStyles(theme);
-  return (
-    <View style={styles.loadingView.suspenseContainer}>
-      <StatusBar style="auto" />
-      <ActivityIndicator size="large" />
-    </View>
-  );
+  return <LoadingView isLoading />;
 });
 
 // Main layout wrapper with theme provider

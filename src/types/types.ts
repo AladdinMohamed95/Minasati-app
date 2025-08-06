@@ -1,3 +1,14 @@
+import { UserType } from "./api";
+
+export interface User {
+  id: number;
+  name: string;
+  phone: string;
+  registered_at?: string;
+  type: UserType;
+  updated_at?: string;
+}
+
 export type formDataProps = {
   name: string;
   phone: string;

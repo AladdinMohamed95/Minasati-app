@@ -1,26 +1,24 @@
-// @ts-ignore
-import Logo from "@/assets/images/icon.png";
-import { PrimaryButton, SecondaryButton } from "@/components/AppButton";
+import { PrimaryButton } from "@/components/AppButton";
 import AppText from "@/components/AppText";
 import { LoadingView } from "@/components/LoadingView";
 import { useTheme } from "@/context/ThemeContext";
 import { useTranslationContext } from "@/context/TranslationContext";
 import { useUser } from "@/context/UserContext";
 import { createStyles } from "@/styles";
+import { LoginResponse, UserType } from "@/types/api";
 import { formDataProps } from "@/types/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
   ScrollView,
   StatusBar,
+  Switch,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -28,22 +26,29 @@ import {
 } from "react-native";
 
 const LoginScreen = () => {
-  const { isLoading, isInitializing, login } = useUser();
+  const { isInitializing, login } = useUser();
   const router = useRouter();
   const { t } = useTranslation();
   const { language } = useTranslationContext();
   const { theme } = useTheme();
   const styles = createStyles(theme);
+
   const [formData, setFormData] = useState<
     Pick<formDataProps, "phone" | "password">
   >({
     phone: "",
     password: "",
   });
+
   const [errors, setErrors] = useState<
     Partial<Record<"name" | "phone" | "password" | "confirm_password", string>>
   >({});
 
+  const [isStudent, setIsStudent] = useState<boolean>(true);
+  const [response, setResponse] = useState<string>("");
+  const [isLoginLoading, setIsLoginLoading] = useState(false); // حالة loading منفصلة للـ login
+
+  //remove later
   useEffect(() => {
     const debugToken = async () => {
       const token = await AsyncStorage.getItem("access_token");
@@ -56,15 +61,7 @@ const LoginScreen = () => {
   }, []);
 
   const handlePhoneRegister = () => {
-    router.push("/studentRegisteration");
-  };
-
-  const handleGuestBrowse = () => {
-    router.push("/booking");
-  };
-
-  const handleTeacherSignup = () => {
-    router.push("/teacherRegister");
+    router.push("/(tabs)/studentRegisteration");
   };
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
@@ -73,6 +70,7 @@ const LoginScreen = () => {
       ...prev,
       [field]: undefined,
     }));
+    setResponse(""); // مسح رسالة الخطأ عند التعديل
   };
 
   const validateForm = () => {
@@ -92,16 +90,40 @@ const LoginScreen = () => {
 
   const handleLogin = async () => {
     if (!validateForm()) return;
+
+    setIsLoginLoading(true);
+    setResponse(""); // مسح أي رسائل خطأ سابقة
+
     try {
-      await login(formData.phone, formData.password);
-      router.push("/(tabs)/profile");
-    } catch (error) {
-      setErrors({ password: t("loginError") || "Login failed" });
+      const res: LoginResponse = await login(
+        formData.phone,
+        formData.password,
+        isStudent ? UserType.student : UserType.teacher
+      );
+
+      if (res.access_token) {
+        router.replace("/"); // استخدام replace بدلاً من push
+      } else {
+        setResponse(t("loginError") || "فشل تسجيل الدخول");
+      }
+    } catch (error: any) {
+      console.log("Login error:", error);
+
+      // التعامل مع رسائل الخطأ المختلفة
+      if (error?.message) {
+        setResponse(error.message);
+      } else if (error?.response?.data?.message) {
+        setResponse(error.response.data.message);
+      } else {
+        setResponse(t("loginError") || "حدث خطأ أثناء تسجيل الدخول");
+      }
+    } finally {
+      setIsLoginLoading(false);
     }
   };
 
   if (isInitializing) {
-    return <LoadingView isLoading={isLoading} />;
+    return <LoadingView isLoading={true} />;
   }
 
   return (
@@ -118,23 +140,18 @@ const LoginScreen = () => {
             contentContainerStyle={{ flexGrow: 1 }}
             keyboardShouldPersistTaps="handled"
           >
-            <View style={styles.homeScreen.logoContainer}>
-              <View style={styles.homeScreen.logoPlaceholder}>
-                <Image
-                  source={Logo}
-                  style={{ width: 100, height: 100, resizeMode: "contain" }}
-                  accessibilityLabel="App Logo"
-                />
-              </View>
-            </View>
-
-            <View style={styles.homeScreen.descriptionContainer}>
-              <AppText style={styles.homeScreen.descriptionText}>
-                {t("slug")}
+            <View style={styles.homeScreen.descriptionContainer} />
+            <View style={styles.homeScreen.signupContainer}>
+              <AppText style={styles.registerScreen.label}>
+                {isStudent ? "طالب" : "معلم"}
               </AppText>
-              {/* <AppText style={styles.homeScreen.subDescriptionText}>
-                {t("slugDesc")}
-              </AppText> */}
+              <Switch
+                value={isStudent}
+                onValueChange={setIsStudent}
+                thumbColor={isStudent ? "#fff" : "#f4f3f4"}
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                disabled={isLoginLoading}
+              />
             </View>
 
             <View style={styles.registerScreen.inputContainer}>
@@ -150,7 +167,7 @@ const LoginScreen = () => {
                 onChangeText={(text) => handleInputChange("phone", text)}
                 keyboardType="phone-pad"
                 textAlign={language === "ar" ? "right" : "left"}
-                editable={!isLoading}
+                editable={!isLoginLoading}
               />
               {errors.phone && (
                 <AppText style={styles.registerScreen.errorText}>
@@ -172,7 +189,7 @@ const LoginScreen = () => {
                 onChangeText={(text) => handleInputChange("password", text)}
                 secureTextEntry={true}
                 textAlign={language === "ar" ? "right" : "left"}
-                editable={!isLoading}
+                editable={!isLoginLoading}
               />
               {errors.password && (
                 <AppText style={styles.registerScreen.errorText}>
@@ -180,58 +197,56 @@ const LoginScreen = () => {
                 </AppText>
               )}
             </View>
+
             <PrimaryButton
-              title={t("login")}
+              title={
+                isLoginLoading ? t("loading") || "جاري التحميل..." : t("login")
+              }
               onPress={handleLogin}
               theme={theme}
               textStyle={styles.whiteAndBlackText.whiteText}
+              disabled={isLoginLoading}
             />
 
-            <SecondaryButton
-              title={t("guest")}
-              onPress={handleGuestBrowse}
-              theme={theme}
-              textStyle={styles.whiteAndBlackText.blackText}
-            />
-            <View style={styles.homeScreen.footerContainer}>
-              <View
+            {response && (
+              <AppText style={styles.registerScreen.errorText}>
+                {response}
+              </AppText>
+            )}
+
+            <TouchableOpacity
+              onPress={handlePhoneRegister}
+              disabled={isLoginLoading}
+            >
+              <AppText
                 style={[
-                  styles.otherViewStyle.teacherSignupContainer,
-                  {
-                    flexDirection: language === "ar" ? "row-reverse" : "row",
-                  },
+                  styles.otherViewStyle.teacherLink,
+                  isLoginLoading && { opacity: 0.5 },
                 ]}
               >
-                <AppText style={styles.otherViewStyle.teacherText}>
-                  {t("newTeacher")}
-                </AppText>
-                <TouchableOpacity onPress={handleTeacherSignup}>
-                  <AppText style={styles.otherViewStyle.teacherLink}>
-                    {t("teacherSignup")}
-                  </AppText>
-                </TouchableOpacity>
-              </View>
-              <View
-                style={[
-                  styles.otherViewStyle.teacherSignupContainer,
-                  {
-                    flexDirection: language === "ar" ? "row-reverse" : "row",
-                  },
-                ]}
-              >
-                <AppText style={styles.otherViewStyle.teacherText}>
-                  {t("newStudent")}
-                </AppText>
-                <TouchableOpacity onPress={handlePhoneRegister}>
-                  <AppText style={styles.otherViewStyle.teacherLink}>
-                    {t("teacherSignup")}
-                  </AppText>
-                </TouchableOpacity>
-              </View>
-            </View>
+                {t("newUser")}
+              </AppText>
+            </TouchableOpacity>
           </ScrollView>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
+
+      {isLoginLoading && (
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.3)",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <LoadingView isLoading={true} />
+        </View>
+      )}
     </SafeAreaView>
   );
 };
