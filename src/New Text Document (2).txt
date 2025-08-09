@@ -1,0 +1,396 @@
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import type { RootState } from "../../store";
+
+export interface EducationalSystemResponse {
+  data: EducationalSystem[];
+}
+
+export interface EducationalSystem {
+  id: number;
+  name: string;
+  description: string;
+}
+
+type GetEducationalSystemsParams = {
+  ids?: number[]; // أمثلة: [1, 3]
+  names?: string[]; // أمثلة: ["IG", "National"]
+};
+
+export interface AcademicStage {
+  id: number;
+  name: string;
+  educational_system: EducationalSystem;
+}
+
+export interface AcademicStagesResponse {
+  data: AcademicStage[];
+}
+
+export interface AcademicYear {
+  id: number;
+  name: string;
+  academic_stage_id: number;
+}
+
+export interface AcademicYearsResponse {
+  data: AcademicYear[];
+}
+
+export interface ClassItem {
+  id: number;
+  name: string;
+  academic_year_id: number;
+}
+
+export interface ClassListResponse {
+  data: ClassItem[];
+}
+
+export interface Teacher {
+  id: number;
+  name: string;
+  specialization: string;
+  mode: "online" | "offline";
+  // أضف المزيد من الحقول عند الحاجة
+}
+
+export interface TeacherListResponse {
+  data: Teacher[];
+  links: PaginationLinks;
+  meta: PaginationMeta;
+}
+
+export type GetTeachersParams = {
+  class_ids?: number[];
+  mode?: "online" | "offline";
+  specialization?: string;
+  teacher_name?: string;
+};
+
+export interface ITeacher {
+  id: number;
+  name: string;
+  phone: string;
+  password?: string;
+  current_workplace?: string;
+  specialization: string;
+  work_title?: string;
+  phone2?: string;
+  home_address?: string;
+  work_address?: string;
+  country?: string;
+  desc?: string;
+  years_of_experience?: number;
+  national_id_egypt?: string;
+  residence_number_outside_egypt?: string;
+  is_online?: number;
+  is_offline?: string;
+  image?: string;
+  is_confirmed: boolean;
+  image_url: string;
+  profile: {
+    workplace: string;
+    title: string;
+    specialization: string;
+    experience_years: string;
+    description: string;
+    country: string;
+  };
+  availability: {
+    online: boolean;
+    offline: boolean;
+  };
+  classes: TeacherClass[];
+}
+
+interface TeacherClass {
+  id: number;
+  name: string;
+  pivot?: {
+    class_price: number;
+    status: string;
+  };
+}
+
+interface IresTeatcher {
+  code: number;
+  message: string;
+  status: boolean;
+  data: ITeacher[];
+  links: {
+    first: string;
+    second: string;
+  };
+  meta: {
+    current_page: number;
+    from: number;
+    last_page: number;
+    links: {
+      active: boolean;
+      label: string;
+      url: string;
+    }[];
+    path: string;
+    per_page: number;
+    to: number;
+    total: number;
+  };
+}
+
+export interface Booking {
+  booking_id: number;
+  status: string | null;
+  booking_time: string;
+  created_at: string;
+  teacher: {
+    id: number;
+    name: string;
+    phone: string;
+    is_confirmed: boolean;
+    image_url: string | null;
+    profile: {
+      workplace: string | null;
+      title: string | null;
+      specialization: string;
+      experience_years: number | null;
+      description: string | null;
+      country: string | null;
+    };
+    availability: {
+      online: boolean;
+      offline: boolean;
+    };
+    classes: {
+      id: number;
+      name: string;
+      academic_year_id: number;
+      pivot: {
+        class_price: number;
+        status: string;
+      };
+      academic_year: {
+        id: number;
+        name: string;
+        academic_stage: {
+          id: number;
+          name: string;
+          educational_system: {
+            id: number;
+            name: string;
+            description: string;
+          };
+        };
+      };
+    }[];
+  };
+  class_details: {
+    id: number;
+    name: string;
+    academic_year: {
+      id: number;
+      name: string;
+      academic_stage: {
+        id: number;
+        name: string;
+        educational_system: {
+          id: number;
+          name: string;
+          description: string;
+        };
+      };
+    };
+  };
+}
+
+interface IresssPost {
+  code: number;
+  message: string;
+  status: boolean;
+  data: Booking;
+}
+const BASE_URL = "https://fcede57585c4.ngrok-free.app/api/public"; // triggers the proxy
+
+export const BookingApi = createApi({
+  reducerPath: "BookingApi",
+  baseQuery: fetchBaseQuery({
+    baseUrl: BASE_URL,
+    prepareHeaders: (headers, { getState }) => {
+      const token = (getState() as RootState).auth.access_token;
+      console.log(token);
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+        // Do not manually set Content-Type for FormData
+      }
+      headers.set("Accept", "application/json");
+
+      return headers;
+    },
+  }),
+  tagTypes: ["Booking"], // ✅ Define tag type
+  endpoints: (builder) => ({
+    getEducationalSystems: builder.query<
+      EducationalSystemResponse,
+      GetEducationalSystemsParams
+    >({
+      query: (params) => {
+        const queryString = new URLSearchParams();
+
+        if (params.ids?.length) {
+          queryString.append("ids", params.ids.join(","));
+        }
+
+        if (params.names?.length) {
+          queryString.append("names", params.names.join(","));
+        }
+
+        if (params.page) {
+          queryString.append("page", String(params.page));
+        }
+
+        if (params.search) {
+          queryString.append("search", params.search);
+        }
+
+        return {
+          url: `educational-systems?${queryString.toString()}`,
+          method: "GET",
+        };
+      },
+    }),
+
+    getAcademicStages: builder.query<
+      AcademicStagesResponse,
+      {
+        ids?: number[];
+        educational_system_id?: number[];
+        search?: string;
+        page: number;
+      }
+    >({
+      query: ({
+        ids = [],
+        educational_system_id = [],
+        search = "",
+        page = 1,
+      }) => {
+        const params = new URLSearchParams();
+
+        params.append("page", page.toString());
+
+        if (search) {
+          params.append("search", search);
+        }
+
+        if (ids.length) {
+          params.append("ids", ids.join(","));
+        }
+
+        if (educational_system_id.length) {
+          // ✅ الصيغة الصحيحة المفصولة بفاصلة
+          params.append(
+            "educational_system_id",
+            educational_system_id.join(",")
+          );
+        }
+
+        return `/academic-stages?${params.toString()}`;
+      },
+    }),
+
+    getAcademicYears: builder.query<
+      AcademicYearsResponse,
+      {
+        ids?: number[];
+        academic_stage_id?: number[];
+        search?: string;
+        page: number;
+      }
+    >({
+      query: ({ ids = [], academic_stage_id = [], search = "", page = 1 }) => {
+        const params = new URLSearchParams();
+
+        params.append("page", page.toString());
+
+        if (search) {
+          params.append("search", search);
+        }
+
+        if (ids.length) {
+          params.append("ids", ids.join(","));
+        }
+
+        if (academic_stage_id.length) {
+          // ✅ الصيغة الصحيحة المفصولة بفاصلة
+          params.append("academic_stage_id", academic_stage_id.join(","));
+        }
+
+        return `/academic-years?${params.toString()}`;
+      },
+    }),
+
+    getClasses: builder.query<
+      ClassListResponse,
+      {
+        ids?: number[];
+        academic_year_id?: number[];
+        search?: string;
+        page: number;
+      }
+    >({
+      query: ({ ids = [], academic_year_id = [], search = "", page = 1 }) => {
+        const params = new URLSearchParams();
+
+        params.append("page", page.toString());
+
+        if (search) {
+          params.append("search", search);
+        }
+
+        if (ids.length) {
+          params.append("ids", ids.join(","));
+        }
+
+        if (academic_year_id.length) {
+          // ✅ الصيغة الصحيحة المفصولة بفاصلة
+          params.append("academic_year_id", academic_year_id.join(","));
+        }
+
+        return `/classes?${params.toString()}`;
+      },
+    }),
+
+    getPublicTeachers: builder.query<
+      IresTeatcher,
+      { class_ids: number[]; mode: string }
+    >({
+      query: ({ class_ids, mode }) => {
+        const classIdsStr = class_ids.join(","); // ← هذا هو التغيير المهم
+        return `/teachers?class_ids=${classIdsStr}&mode=${mode}`;
+      },
+    }),
+
+    bookStudent: builder.mutation<
+      IresssPost,
+      {
+        teacher_id: number;
+        class_id: number;
+        booking_time: string;
+      }
+    >({
+      query: (body) => ({
+        url: `/student/bookings`,
+        method: "POST",
+        body,
+      }),
+    }),
+  }),
+});
+
+export const {
+  useGetEducationalSystemsQuery,
+  useGetAcademicStagesQuery,
+  useGetAcademicYearsQuery,
+  useGetClassesQuery,
+  useGetPublicTeachersQuery,
+  useBookStudentMutation,
+} = BookingApi;

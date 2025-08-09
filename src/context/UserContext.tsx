@@ -7,8 +7,8 @@ import {
 import {
   getProfile as getStudentProfile,
   updateProfile as updateStudentProfile,
-} from "@/api/studentsMiddleware";
-import { getProfile as getTeacherProfile } from "@/api/teachersMiddlewate";
+} from "@/api/studentsMiddleware.api";
+import { getProfile as getTeacherProfile } from "@/api/teachersMiddleware.api";
 import { LoadingView } from "@/components/LoadingView";
 import { LoginResponse, RegisterRequest, UserType } from "@/types/api";
 import { User } from "@/types/types";
@@ -133,32 +133,26 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setIsLoading(true);
 
-      // استدعاء API تسجيل الدخول
       if (userType === UserType.student) {
         response = await studentLogin({ phone, password });
       } else {
         response = await teacherLogin({ phone, password });
       }
 
-      // التحقق من صحة الاستجابة
       if (!response) {
         throw new Error("لم يتم استلام استجابة من الخادم");
       }
 
-      // لو مفيش توكن في الريسبونس نرجع على طول بدون حفظ بيانات
       if (!response?.access_token) {
-        // إرجاع الاستجابة مع رسالة خطأ واضحة
         return {
           ...response,
           message: response.message || "بيانات تسجيل الدخول غير صحيحة",
         };
       }
 
-      // حفظ التوكن ونوع المستخدم
       await AsyncStorage.setItem("access_token", response.access_token);
       await AsyncStorage.setItem("userType", userType);
 
-      // جلب البروفايل فقط لو التوكن موجود
       try {
         if (userType === UserType.student) {
           const profile = await getStudentProfile();

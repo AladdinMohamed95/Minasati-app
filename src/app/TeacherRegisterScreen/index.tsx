@@ -1,4 +1,4 @@
-import { updateProfile } from "@/api/teachersMiddlewate";
+import { updateProfile } from "@/api/teachersMiddleware.api";
 import { PrimaryButton } from "@/components/AppButton";
 import AppText from "@/components/AppText";
 import { LoadingView } from "@/components/LoadingView";
@@ -105,14 +105,12 @@ const TeacherEditScreen = () => {
       Record<keyof TeacherProfileRequest | "confirm_password", string>
     > = {};
 
-    // الحقول المطلوبة
     if (!formData.name?.trim()) newErrors.name = t("nameError");
     if (!formData.specialization?.trim())
-      newErrors.specialization = t("specializationRequiredError");
+      newErrors.specialization = t("specializationError");
     if (!formData.work_title?.trim())
-      newErrors.work_title = t("workTitleRequiredError");
+      newErrors.work_title = t("workTitleError");
 
-    // التحقق من كلمة المرور إذا تم إدخالها
     if (formData.password?.trim()) {
       if (formData.password.length < 6) {
         newErrors.password = t("passwordTooShortError");
@@ -124,20 +122,18 @@ const TeacherEditScreen = () => {
       }
     }
 
-    // التحقق من سنوات الخبرة
     if (formData.years_of_experience) {
       const years = formData.years_of_experience;
       if (isNaN(years) || years < 0) {
-        newErrors.years_of_experience = t("yearsOfExperienceError");
+        newErrors.years_of_experience = t("yearsExperienceError");
       }
     }
 
-    // التحقق من الرقم القومي أو رقم الإقامة
     if (
       !formData.national_id_egypt?.trim() &&
       !formData.residence_number_outside_egypt?.trim()
     ) {
-      newErrors.national_id_egypt = t("nationalIdOrResidenceRequiredError");
+      newErrors.national_id_egypt = t("identificationError");
     }
 
     setErrors(newErrors);
@@ -181,7 +177,7 @@ const TeacherEditScreen = () => {
           text: t("ok"),
           onPress: () => {
             router.replace({
-              pathname: "/(tabs)/teacherProfile",
+              pathname: "/",
               params: { refresh: "true" },
             });
           },
@@ -198,9 +194,7 @@ const TeacherEditScreen = () => {
   if (!isInitialized) {
     return (
       <SafeAreaView style={styles.homeScreen.container}>
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
+        <View style={styles.registerScreen.loading}>
           <LoadingView isLoading={true} />
         </View>
       </SafeAreaView>
@@ -210,9 +204,7 @@ const TeacherEditScreen = () => {
   if (isLoading) {
     return (
       <SafeAreaView style={styles.homeScreen.container}>
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
+        <View style={styles.registerScreen.loading}>
           <LoadingView isLoading={isLoading} />
         </View>
       </SafeAreaView>
@@ -223,11 +215,8 @@ const TeacherEditScreen = () => {
     <SafeAreaView style={styles.homeScreen.container}>
       <ScrollView style={styles.registerScreen.scrollContainer}>
         <View style={styles.registerScreen.formContainer}>
-          <AppText style={styles.registerScreen.title}>
-            {t("editTeacherTitle")}
-          </AppText>
+          <AppText style={styles.registerScreen.title}>{t("edit")}</AppText>
 
-          {/* البيانات الأساسية */}
           <View style={styles.registerScreen.inputContainer}>
             <AppText style={styles.registerScreen.label}>{t("name")} *</AppText>
             <TextInput
@@ -267,7 +256,6 @@ const TeacherEditScreen = () => {
             )}
           </View>
 
-          {/* كلمة المرور */}
           <View style={styles.registerScreen.inputContainer}>
             <AppText style={styles.registerScreen.label}>
               {t("password")}
@@ -315,7 +303,6 @@ const TeacherEditScreen = () => {
             )}
           </View>
 
-          {/* البيانات المهنية */}
           <View style={styles.registerScreen.inputContainer}>
             <AppText style={styles.registerScreen.label}>
               {t("specialization")} *
@@ -405,7 +392,6 @@ const TeacherEditScreen = () => {
             )}
           </View>
 
-          {/* العناوين */}
           <View style={styles.registerScreen.inputContainer}>
             <AppText style={styles.registerScreen.label}>
               {t("homeAddress")}
@@ -452,7 +438,6 @@ const TeacherEditScreen = () => {
             )}
           </View>
 
-          {/* الوصف */}
           <View style={styles.registerScreen.inputContainer}>
             <AppText style={styles.registerScreen.label}>
               {t("description")}
@@ -477,7 +462,6 @@ const TeacherEditScreen = () => {
             )}
           </View>
 
-          {/* أرقام الهوية */}
           <View style={styles.registerScreen.inputContainer}>
             <AppText style={styles.registerScreen.label}>
               {t("nationalIdEgypt")}
@@ -526,11 +510,8 @@ const TeacherEditScreen = () => {
             )}
           </View>
 
-          {/* خيارات التدريس */}
           <View style={styles.homeScreen.signupContainer}>
-            <AppText style={styles.registerScreen.label}>
-              {t("onlineTeaching")}
-            </AppText>
+            <AppText style={styles.registerScreen.label}>{t("online")}</AppText>
             <Switch
               value={formData.is_online}
               onValueChange={(value) => handleInputChange("is_online", value)}
@@ -541,7 +522,7 @@ const TeacherEditScreen = () => {
 
           <View style={styles.homeScreen.signupContainer}>
             <AppText style={styles.registerScreen.label}>
-              {t("offlineTeaching")}
+              {t("offline")}
             </AppText>
             <Switch
               value={formData.is_offline}

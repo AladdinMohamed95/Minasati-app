@@ -1,10 +1,10 @@
 import {
   getProfile,
   uploadTeacherProfileImage,
-} from "@/api/teachersMiddlewate";
+} from "@/api/teachersMiddleware.api";
 import * as ImagePicker from "expo-image-picker";
 // @ts-ignore
-import Logo from "@/assets/images/icon.png";
+import Logo from "@/assets/images/icon.webp";
 import { SecondaryButton } from "@/components/AppButton";
 import AppText from "@/components/AppText";
 import { HelloWave } from "@/components/HelloWave";
@@ -50,7 +50,7 @@ const TeacherProfileScreen = () => {
 
   const editProfile = () => {
     router.push({
-      pathname: "/(tabs)/teacherRegister",
+      pathname: "/TeacherRegisterScreen",
       params: {
         mode: "edit",
         teacherData: JSON.stringify(profile),
@@ -84,7 +84,7 @@ const TeacherProfileScreen = () => {
       setUploading(true);
       const result = await uploadTeacherProfileImage(uri);
 
-      const imageUrl = result.image_url; // ✅ موجود دلوقتي
+      const imageUrl = result.image_url;
 
       Alert.alert("Success", "Profile image updated successfully!");
       setProfile((prev: any) =>
@@ -101,7 +101,7 @@ const TeacherProfileScreen = () => {
   if (!profile) {
     return (
       <SafeAreaView style={styles.homeScreen.container}>
-        <AppText>جارٍ تحميل البيانات...</AppText>
+        <AppText>{t("loadingData")}</AppText>
       </SafeAreaView>
     );
   }
@@ -122,11 +122,10 @@ const TeacherProfileScreen = () => {
             />
           </TouchableOpacity>
           <AppText style={styles.profileViewStyles.changeImageText}>
-            {uploading ? "جاري الرفع..." : "اضغط لتغيير الصورة"}
+            {uploading ? t("uploading") : t("uploadImage")}
           </AppText>
         </View>
 
-        {/* الترحيب */}
         <View style={styles.profileViewStyles.headerContainer}>
           <AppText style={styles.profileViewStyles.greetingText}>
             {t("Hello")}, {profile.name}
@@ -138,102 +137,113 @@ const TeacherProfileScreen = () => {
           <LanguageSwitcher />
         </View>
 
-        {/* معلومات الحساب */}
         <View style={styles.profileViewStyles.card}>
           <AppText style={styles.profileViewStyles.sectionTitle}>
-            معلومات الحساب
+            {t("accountInfo")}
           </AppText>
           <View style={styles.profileViewStyles.row}>
-            <AppText style={styles.profileViewStyles.label}>الهاتف</AppText>
+            <AppText style={styles.profileViewStyles.label}>
+              {t("phone")}
+            </AppText>
             <AppText style={styles.profileViewStyles.value}>
               {profile.phone}
             </AppText>
           </View>
           <View style={styles.profileViewStyles.row}>
             <AppText style={styles.profileViewStyles.label}>
-              تاريخ التسجيل
+              {t("registeredAt")}
             </AppText>
             <AppText style={styles.profileViewStyles.value}>
               {profile.created_at}
             </AppText>
           </View>
           <View style={styles.profileViewStyles.row}>
-            <AppText style={styles.profileViewStyles.label}>آخر تحديث</AppText>
+            <AppText style={styles.profileViewStyles.label}>
+              {t("updatedAt")}
+            </AppText>
             <AppText style={styles.profileViewStyles.value}>
               {profile.updated_at}
             </AppText>
           </View>
           <View style={styles.profileViewStyles.row}>
-            <AppText style={styles.profileViewStyles.label}>الحالة</AppText>
+            <AppText style={styles.profileViewStyles.label}>
+              {t("status")}
+            </AppText>
             <AppText style={styles.profileViewStyles.value}>
-              {profile.is_confirmed ? "مفعل" : "غير مفعل"}
+              {profile.is_confirmed ? t("active") : t("notActive")}
             </AppText>
           </View>
         </View>
 
-        {/* بيانات المدرس */}
         <View style={styles.profileViewStyles.card}>
           <AppText style={styles.profileViewStyles.sectionTitle}>
-            بيانات المدرس
+            {t("teacherInfo")}
           </AppText>
           <View style={styles.profileViewStyles.row}>
-            <AppText style={styles.profileViewStyles.label}>التخصص</AppText>
+            <AppText style={styles.profileViewStyles.label}>
+              {t("specialization")}
+            </AppText>
             <AppText style={styles.profileViewStyles.value}>
-              {profile.profile.specialization || "غير محدد"}
+              {profile.profile.specialization || t("notSpecified")}
             </AppText>
           </View>
           <View style={styles.profileViewStyles.row}>
             <AppText style={styles.profileViewStyles.label}>
-              العنوان الوظيفي
+              {t("profileTitle")}
             </AppText>
             <AppText style={styles.profileViewStyles.value}>
-              {profile.profile.title || "غير محدد"}
-            </AppText>
-          </View>
-          <View style={styles.profileViewStyles.row}>
-            <AppText style={styles.profileViewStyles.label}>الوصف</AppText>
-            <AppText style={styles.profileViewStyles.value}>
-              {profile.profile.description || "لا يوجد"}
+              {profile.profile.title || t("notSpecified")}
             </AppText>
           </View>
           <View style={styles.profileViewStyles.row}>
             <AppText style={styles.profileViewStyles.label}>
-              عدد سنوات الخبرة
+              {t("profileDescription")}
+            </AppText>
+            <AppText style={styles.profileViewStyles.value}>
+              {profile.profile.description || t("notAvailable")}
+            </AppText>
+          </View>
+          <View style={styles.profileViewStyles.row}>
+            <AppText style={styles.profileViewStyles.label}>
+              {t("yearsOfExperience")}
             </AppText>
             <AppText style={styles.profileViewStyles.value}>
               {profile.profile.experience_years}
             </AppText>
           </View>
           <View style={styles.profileViewStyles.row}>
-            <AppText style={styles.profileViewStyles.label}>مكان العمل</AppText>
+            <AppText style={styles.profileViewStyles.label}>
+              {t("workAddress")}
+            </AppText>
             <AppText style={styles.profileViewStyles.value}>
-              {profile.profile.workplace || "غير محدد"}
+              {profile.profile.workplace || t("notSpecified")}
             </AppText>
           </View>
           <View style={styles.profileViewStyles.row}>
-            <AppText style={styles.profileViewStyles.label}>التواجد</AppText>
+            <AppText style={styles.profileViewStyles.label}>
+              {t("availability")}
+            </AppText>
             <AppText style={styles.profileViewStyles.value}>
               {profile.availability.online
-                ? "أونلاين"
+                ? t("online")
                 : profile.availability.offline
-                ? "أوفلاين"
-                : "غير محدد"}
+                ? t("offline")
+                : t("notSpecified")}
             </AppText>
           </View>
         </View>
 
-        {/* الأزرار */}
         <TouchableOpacity
           onPress={editProfile}
-          style={styles.profileViewStyles.editButton}
+          style={styles.appButton.smallSecondaryButton}
         >
-          <AppText style={styles.profileViewStyles.editButtonText}>
-            تعديل البيانات
+          <AppText style={styles.appButton.smallSecondaryButtonText}>
+            {t("updateButton")}
           </AppText>
         </TouchableOpacity>
 
         <SecondaryButton
-          title="تسجيل الخروج"
+          title={t("logout")}
           onPress={handleLogout}
           theme={theme}
           textStyle={styles.whiteAndBlackText.blackText}

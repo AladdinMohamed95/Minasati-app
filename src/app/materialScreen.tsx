@@ -14,7 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { ModalView } from "./modalView";
+import { ModalView } from "./modals/modalView";
 
 I18nManager.allowRTL(true);
 I18nManager.forceRTL(true);

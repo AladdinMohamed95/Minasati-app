@@ -13,7 +13,7 @@ export const studentRegister = async (
   request: RegisterRequest,
   userType: UserType
 ): Promise<RegisterResponse> => {
-  const response = await api.post("/student/register", request);
+  const response = await api.post("/api/student/register", request);
 
   const data: RegisterResponse = response.data;
   if (data.access_token) {
@@ -28,9 +28,10 @@ export const studentRegister = async (
 export const studentLogin = async (
   request: LoginRequest
 ): Promise<LoginResponse> => {
-  const response = await api.post("/student/login", request);
+  const response = await api.post("/api/student/login", request);
 
   const data: LoginResponse = response.data;
+  console.log("data", JSON.stringify(data));
   if (data.access_token) {
     await AsyncStorage.setItem("access_token", data.access_token);
     await AsyncStorage.setItem("token_type", data.token_type);
@@ -41,7 +42,7 @@ export const studentLogin = async (
 };
 
 export const studentLogout = async (): Promise<string> => {
-  const message: string = await api.post("/student/logout");
+  const message: string = await api.post("/api/student/logout");
   await AsyncStorage.multiRemove([
     "access_token",
     "token_type",
@@ -56,7 +57,7 @@ export const teacherRegister = async (
   request: RegisterRequest,
   userType: UserType
 ): Promise<RegisterResponse> => {
-  const response = await api.post("/teacher/register", request);
+  const response = await api.post("/api/teacher/register", request);
   console.log("teacher register");
   const data: RegisterResponse = response.data;
   if (data.access_token) {
@@ -72,7 +73,7 @@ export const teacherRegister = async (
 export const teacherLogin = async (
   request: LoginRequest
 ): Promise<LoginResponse> => {
-  const response = await api.post("/teacher/login", request);
+  const response = await api.post("/api/teacher/login", request);
   console.log("teacherLogin response", JSON.stringify(response));
   const data: LoginResponse = response.data;
   if (data.access_token) {
@@ -84,7 +85,7 @@ export const teacherLogin = async (
 };
 
 export const teacherLogout = async (): Promise<string> => {
-  const message: string = await api.post("/teacher/logout");
+  const message: string = await api.post("/api/teacher/logout");
   await AsyncStorage.multiRemove([
     "access_token",
     "token_type",

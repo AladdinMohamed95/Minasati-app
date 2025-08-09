@@ -1,0 +1,312 @@
+import { useForm, Controller, type SubmitHandler } from "react-hook-form";
+import Select from "react-select";
+// import { format } from "date-fns";
+import DatePicker from "react-datepicker";
+import Swal from "sweetalert2";
+import { useState } from "react";
+
+import {
+  // useBookStudentMutation,
+  useGetAcademicStagesQuery,
+  useGetAcademicYearsQuery,
+  useGetClassesQuery,
+  useGetEducationalSystemsQuery,
+} from "../../store/featchers/students/BookingSlice";
+// import type { errorType } from "../../types";
+// import Button from "../ui/button/Button";
+import { useNavigate } from "react-router-dom";
+
+export interface CreateBookingRequest {
+  teacher_id?: number;
+  class_id: number[]; // ⬅️ array
+  booking_time?: string;
+  Edu_id?: number;
+  stage_id?: number[]; // ⬅️ array
+  years_id: number[]; // ⬅️ array
+  online?: string;
+}
+type Option = {
+  label: string;
+  value: number;
+};
+
+export default function AddAcademicBooking() {
+  // const [eduSysData, setEduSysData] = useState<IEduSystems | null>(null);
+  //state
+  const navigate = useNavigate();
+  const [BookingDate, setBookingDate] = useState<Date | null>(null);
+
+  const [selectedEduId, setSelectedEduId] = useState<number | null>(null);
+  const [selectedStageId, setSelectedStageId] = useState<number[]>([]);
+  // const [selectedYearsId, setSelectedYearsId] = useState<number | null>(null);
+  const [selectedYearsId, setSelectedYearsId] = useState<number[]>([]);
+  const [mode, setMode] = useState<"online" | "offline" | "">("");
+  //fetch Edu System
+  const { data: EduData, isLoading: EduLoad } = useGetEducationalSystemsQuery({
+    search: "",
+    page: 1,
+  });
+  const EduSystems = EduData?.data ?? [];
+  const eduSysOptions: Option[] =
+    EduSystems.map((EduSystem) => ({
+      value: EduSystem.id || 0,
+      label: EduSystem.name,
+    })) || [];
+
+  //fetch Stage
+  const { data: StageData, isLoading: stageLoad } = useGetAcademicStagesQuery(
+    {
+      search: "",
+      page: 1,
+      educational_system_id: selectedEduId ? [selectedEduId] : undefined,
+    },
+    {
+      skip: !selectedEduId, // لا يتم الجلب إذا لم يتم تحديد النظام
+    }
+  );
+
+  const Stages = StageData?.data ?? [];
+  const StagesOptions: Option[] =
+    Stages.map((Stage) => ({
+      value: Stage.id || 0,
+      label: Stage.name,
+    })) || [];
+
+  //fetch years
+  const { data: YearsData, isLoading: YearsLoad } = useGetAcademicYearsQuery(
+    {
+      search: "",
+      page: 1,
+      academic_stage_id: selectedStageId.length ? selectedStageId : undefined,
+    },
+    {
+      skip: !selectedStageId, // لا يتم الجلب إذا لم يتم تحديد النظام
+    }
+  );
+
+  const Years = YearsData?.data ?? [];
+  const YearsOptions: Option[] =
+    Years.map((Year) => ({
+      value: Year.id || 0,
+      label: Year.name,
+    })) || [];
+
+  //fetch Classes
+  const { data: ClassesData, isLoading: ClassesLoad } = useGetClassesQuery(
+    {
+      search: "",
+      page: 1,
+      academic_year_id: selectedYearsId.length ? selectedYearsId : undefined,
+    },
+    {
+      skip: !selectedYearsId, // لا يتم الجلب إذا لم يتم تحديد النظام
+    }
+  );
+  const Classes = ClassesData?.data ?? [];
+  const ClassesOptions: Option[] =
+    Classes.map((Classe) => ({
+      value: Classe.id || 0,
+      label: Classe.name,
+    })) || [];
+
+  // const [bookStudent, { data, isLoading }] = useBookStudentMutation();
+
+  const {
+    // register,
+    handleSubmit,
+    control,
+    // formState: { errors },
+  } = useForm<CreateBookingRequest>({});
+
+  // ...
+  const onSubmit: SubmitHandler<CreateBookingRequest> = (data) => {
+    if (!data.class_id.length || !mode) {
+      Swal.fire(
+        "خطأ",
+        "يرجى اختيار مادة واحدة على الأقل وطريقة الحضور",
+        "error"
+      );
+      return;
+    }
+
+    navigate("/teachers", {
+      state: {
+        class_ids: data.class_id,
+        mode,
+      },
+    });
+  };
+
+  return (
+    /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
+    <form
+      className="flex flex-col gap-6 p-6 w-full max-w-2xl mx-auto bg-white shadow-lg rounded-lg"
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      {/* النظام التعليمي */}
+      <Controller
+        control={control}
+        name="Edu_id"
+        render={({ field }) => (
+          <div>
+            <label className="block mb-2 font-medium">النظام التعليمي</label>
+            <Select<Option, false>
+              {...field}
+              options={eduSysOptions}
+              isClearable
+              isLoading={EduLoad}
+              placeholder="اختر النظام التعليمي"
+              onChange={(val) => {
+                const value = val?.value ?? null;
+                field.onChange(value);
+                setSelectedEduId(typeof value === "number" ? value : null);
+              }}
+              value={eduSysOptions.find((opt) => opt.value === field.value)}
+            />
+          </div>
+        )}
+      />
+
+      {/* المرحلة التعليمية */}
+
+      <Controller
+        control={control}
+        name="stage_id"
+        render={({ field }) => (
+          <div>
+            <label className="block mb-2 font-medium">المرحلة التعليمية</label>
+            <Select<Option, true>
+              {...field}
+              options={StagesOptions}
+              isMulti
+              isClearable
+              isLoading={stageLoad}
+              placeholder="اختر المرحلة"
+              onChange={(val) => {
+                const values = val?.map((v) => v.value as number) ?? [];
+                field.onChange(values);
+                setSelectedStageId(values); // تخزين جميع المراحل
+              }}
+              value={StagesOptions.filter((opt) =>
+                Array.isArray(field.value)
+                  ? field.value.includes(opt.value)
+                  : false
+              )}
+            />
+          </div>
+        )}
+      />
+
+      {/* الصف الدراسي */}
+
+      <Controller
+        control={control}
+        name="years_id"
+        render={({ field }) => (
+          <div>
+            <label className="block mb-2 font-medium">الصف الدراسي</label>
+            <Select<Option, true>
+              {...field}
+              options={YearsOptions}
+              isMulti
+              isClearable
+              isLoading={YearsLoad}
+              placeholder="اختر الصفوف"
+              onChange={(val) => {
+                const values = val?.map((v) => v.value as number) ?? [];
+                field.onChange(values);
+                setSelectedYearsId(values); // تخزين جميع الصفوف
+              }}
+              value={YearsOptions.filter((opt) =>
+                Array.isArray(field.value)
+                  ? field.value.includes(opt.value)
+                  : false
+              )}
+            />
+          </div>
+        )}
+      />
+
+      {/* المادة */}
+      <Controller
+        control={control}
+        name="class_id"
+        render={({ field }) => (
+          <div>
+            <label className="block mb-2 font-medium">المادة</label>
+            <Select<Option, true>
+              {...field}
+              options={ClassesOptions}
+              isMulti
+              isClearable
+              isLoading={ClassesLoad}
+              placeholder="اختر المواد"
+              onChange={(val) => {
+                const values = val?.map((v) => v.value as number) ?? [];
+                field.onChange(values);
+              }}
+              value={ClassesOptions.filter((opt) =>
+                Array.isArray(field.value)
+                  ? field.value.includes(opt.value)
+                  : false
+              )}
+            />
+          </div>
+        )}
+      />
+
+      {/* تاريخ الحجز */}
+      <div>
+        <label className="block mb-2 font-medium">تاريخ الحجز</label>
+        <DatePicker
+          selected={BookingDate}
+          onChange={(date) => setBookingDate(date)}
+          dateFormat="yyyy-MM-dd"
+          placeholderText="اختر التاريخ والوقت"
+          className="border w-full px-4 py-2 rounded-md"
+          isClearable
+          showTimeSelect
+          timeFormat="HH:mm"
+          timeIntervals={15}
+          timeCaption="الوقت"
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          طريقة الحضور
+        </label>
+        <div className="flex gap-4">
+          <label className="flex items-center">
+            <input
+              type="radio"
+              name="mode"
+              value="online"
+              checked={mode === "online"}
+              onChange={(e) => setMode(e.target.value as "online")}
+              className="mr-2"
+            />
+            أونلاين
+          </label>
+          <label className="flex items-center">
+            <input
+              type="radio"
+              name="mode"
+              value="offline"
+              checked={mode === "offline"}
+              onChange={(e) => setMode(e.target.value as "offline")}
+              className="mr-2"
+            />
+            أوفلاين
+          </label>
+        </div>
+      </div>
+
+      {/* زر الحجز */}
+      <button className="bg-orange-500 hover:bg-orange-600 text-white text-lg px-6 py-3 rounded-full w-full mt-4">
+        {" "}
+        قم باختيار المعلم
+      </button>
+    </form>
+  );
+}

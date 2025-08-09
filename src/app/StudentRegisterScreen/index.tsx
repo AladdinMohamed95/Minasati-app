@@ -135,9 +135,7 @@ const StudentFormScreen = () => {
           { text: t("ok"), onPress: () => router.back() },
         ]);
       } else {
-        // تحديد نوع المستخدم بناءً على حالة Switch
         if (isEnabled) {
-          // تسجيل طالب
           await studentRegister(
             {
               name: formData.name,
@@ -146,14 +144,13 @@ const StudentFormScreen = () => {
               password_confirmation: formData.password_confirmation,
             },
             UserType.student
-          ); // إضافة UserType
+          );
           Alert.alert(
             t("registrationSuccess"),
             t("studentRegisteredSuccessfully"),
-            [{ text: t("ok"), onPress: () => router.push("/(tabs)/profile") }]
+            [{ text: t("ok"), onPress: () => router.push("/") }]
           );
         } else {
-          // تسجيل معلم
           await teacherRegister(
             {
               name: formData.name,
@@ -162,11 +159,16 @@ const StudentFormScreen = () => {
               password_confirmation: formData.password_confirmation,
             },
             UserType.teacher
-          ); // إضافة UserType
+          );
           Alert.alert(
             t("registrationSuccess"),
             t("teacherRegisteredSuccessfully"),
-            [{ text: t("ok"), onPress: () => router.push("/(tabs)/profile") }]
+            [
+              {
+                text: t("ok"),
+                onPress: () => router.push("/"),
+              },
+            ]
           );
         }
       }
@@ -189,9 +191,7 @@ const StudentFormScreen = () => {
   if (!isInitialized) {
     return (
       <SafeAreaView style={styles.homeScreen.container}>
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
+        <View style={styles.registerScreen.loading}>
           <LoadingView isLoading={isLoading} />
         </View>
       </SafeAreaView>
@@ -201,9 +201,7 @@ const StudentFormScreen = () => {
   if (isLoading) {
     return (
       <SafeAreaView style={styles.homeScreen.container}>
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
+        <View style={styles.registerScreen.loading}>
           <LoadingView isLoading={isLoading} />
         </View>
       </SafeAreaView>
@@ -226,7 +224,7 @@ const StudentFormScreen = () => {
 
           <View style={styles.homeScreen.signupContainer}>
             <AppText style={styles.registerScreen.label}>
-              {isEnabled ? "طالب" : "معلم"}
+              {isEnabled ? t("student") : t("teacher")}
             </AppText>
             <Switch
               value={isEnabled}

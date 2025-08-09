@@ -1,38 +1,38 @@
 {
   "expo": {
-    "name": "منصة الماسة التعليمية",
-    "slug": "almasa-learning-platform",
+    "name": "Keen",
+    "slug": "keen",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./src/assets/images/icon.png",
-    "scheme": "almasa-learning-platform",
+    "icon": "./src/assets/images/icon.webp",
+    "scheme": "Keen",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./src/assets/images/adaptive-icon.png",
+      "splash": {
+        "image": "./src/assets/images/splash-icon.webp",
+        "resizeMode": "cover",
         "backgroundColor": "#ffffff"
       },
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/images/adaptive-icon.webp",
+        "elevation": 0,
+        "borderWidth": 0,
+        "borderRadius": 50
+      },
       "edgeToEdgeEnabled": true,
-      "package": "com.aladdinmohamed.almasalearningplatform"
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./src/assets/images/favicon.png"
+      "package": "com.aladdinmohamed.keen"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./src/assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "cover",
-          "backgroundColor": "#ffffff"
+          "image": "./src/assets/images/splash-icon.webp",
+          "resizeMode": "cover"
         }
       ],
       "expo-localization",

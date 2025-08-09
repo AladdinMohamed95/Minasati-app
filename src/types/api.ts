@@ -28,7 +28,7 @@ export type RegisterResponse = {
   access_token: string;
   token_type: string;
 };
-
+//-----------------------------------
 export type StudentProfileResponse = {
   id: number;
   name: string;
@@ -36,12 +36,15 @@ export type StudentProfileResponse = {
   registered_at: string;
 };
 
-export type Booking = {
-  id: number;
-  teacher_id: number;
-  class_id: number;
+//-----------------------------------
+export interface Booking {
+  booking_id: number;
+  status: string;
   booking_time: string;
-};
+  teacher: Teacher;
+  class_details: ClassItem;
+  created_at: string;
+}
 
 export type BookingRequest = {
   teacher_id: number;
@@ -57,6 +60,46 @@ export type BookingResponse = {
     [key: string]: string[] | undefined;
   };
 };
+
+//-----------------------------------
+
+export interface TeacherAvailableClasses {
+  id: number;
+  name: string;
+  academic_year_id: number;
+  created_at: string;
+  updated_at: string;
+  pivot: {
+    teacher_id: number;
+    class_id: number;
+    id: number;
+    status: string;
+    class_price: number;
+    created_at: string;
+    updated_at: string;
+  };
+  academic_year: {
+    id: number;
+    name: string;
+    academic_stage_id: number;
+    created_at: string;
+    updated_at: string;
+    academic_stage: {
+      id: number;
+      name: string;
+      educational_system_id: number;
+      created_at: string;
+      updated_at: string;
+      educational_system: {
+        id: number;
+        name: string;
+        description: string;
+        created_at: string;
+        updated_at: string;
+      };
+    };
+  };
+}
 export interface TeacherProfileRequest {
   name: string;
   phone2: string;
@@ -75,7 +118,6 @@ export interface TeacherProfileRequest {
   password: string;
   password_confirmation: string;
 }
-
 export interface TeacherProfileResponse {
   id: number;
   name: string;
@@ -94,47 +136,10 @@ export interface TeacherProfileResponse {
     online: boolean;
     offline: boolean;
   };
-  classes: {
-    id: number;
-    name: string;
-    academic_year_id: number;
-    created_at: string;
-    updated_at: string;
-    pivot: {
-      teacher_id: number;
-      class_id: number;
-      id: number;
-      status: string;
-      class_price: number;
-      created_at: string;
-      updated_at: string;
-    };
-    academic_year: {
-      id: number;
-      name: string;
-      academic_stage_id: number;
-      created_at: string;
-      updated_at: string;
-      academic_stage: {
-        id: number;
-        name: string;
-        educational_system_id: number;
-        created_at: string;
-        updated_at: string;
-        educational_system: {
-          id: number;
-          name: string;
-          description: string;
-          created_at: string;
-          updated_at: string;
-        };
-      };
-    };
-  }[];
+  classes: TeacherAvailableClasses[];
   created_at: string;
   updated_at: string;
 }
-
 export interface TeacherClassesResponse {
   data: ClassItem[];
   links: {
@@ -158,11 +163,18 @@ export interface TeacherClassesResponse {
     total: number;
   };
 }
+//-----------------------------------
 
-export interface ClassItem {
+export interface EducationalSystem {
   id: number;
   name: string;
-  academic_year: AcademicYear;
+  description: string;
+}
+
+export interface AcademicStage {
+  id: number;
+  name: string;
+  educational_system: EducationalSystem;
 }
 
 export interface AcademicYear {
@@ -171,40 +183,36 @@ export interface AcademicYear {
   academic_stage: AcademicStage;
 }
 
-export interface AcademicStage {
+export interface ClassItem {
   id: number;
   name: string;
-  educational_system: EducationalSystem;
+  academic_year: AcademicYear;
 }
 
-export interface EducationalSystem {
+export interface Teacher {
   id: number;
   name: string;
-  description: string;
+  phone: string;
+  is_confirmed: boolean;
+  image_url: string;
+  profile: {
+    workplace: string | null;
+    title: string | null;
+    specialization: string;
+    experience_years: number;
+    description: string | null;
+    country: string;
+  };
+  availability: {
+    online: boolean;
+    offline: boolean;
+  };
+  classes: TeacherAvailableClasses[];
 }
+//-----------------------------------
 
 export interface TeacherRegistrationsResponse {
   data: RegistrationItem[];
-  links: {
-    first: string;
-    last: string;
-    prev: string | null;
-    next: string | null;
-  };
-  meta: {
-    current_page: number;
-    from: number;
-    last_page: number;
-    links: {
-      url: string | null;
-      label: string;
-      active: boolean;
-    }[];
-    path: string;
-    per_page: number;
-    to: number;
-    total: number;
-  };
 }
 
 export interface RegistrationItem {
@@ -213,53 +221,16 @@ export interface RegistrationItem {
   registration_status: string;
   class_price: number;
   registration_id: number;
-  academic_context: AcademicContext;
-}
-
-export interface AcademicContext {
-  id: number;
-  name: string;
-  academic_stage: AcademicStage;
-}
-
-export interface AcademicStage {
-  id: number;
-  name: string;
-  educational_system: EducationalSystem;
-}
-
-export interface EducationalSystem {
-  id: number;
-  name: string;
-  description: string;
+  academic_context: AcademicYear;
 }
 
 export interface RegistrationRequest {
   class_price: number;
 }
+//-----------------------------------
 
 export interface TeacherBookingsResponse {
   data: BookingItem[];
-  links: {
-    first: string;
-    last: string;
-    prev: string | null;
-    next: string | null;
-  };
-  meta: {
-    current_page: number;
-    from: number;
-    last_page: number;
-    links: {
-      url: string | null;
-      label: string;
-      active: boolean;
-    }[];
-    path: string;
-    per_page: number;
-    to: number;
-    total: number;
-  };
 }
 
 export interface BookingItem {
@@ -267,7 +238,7 @@ export interface BookingItem {
   status: string; // e.g. "confirmed", "pending"
   booking_time: string; // datetime
   student: Student;
-  class_details: ClassDetails;
+  class_details: ClassItem;
   created_at: string;
 }
 
@@ -278,8 +249,20 @@ export interface Student {
   registered_at: string;
 }
 
-export interface ClassDetails {
-  id: number;
-  name: string;
-  academic_year: AcademicYear;
+export interface PendingRegistration {
+  id: string;
+  class_id: number;
+  class_name: string;
+  class_price: string;
+}
+
+export interface MultiRegistrationRequest {
+  registrations: {
+    class_id: number;
+    class_price: number;
+  }[];
+}
+
+export interface SingleRegistrationRequest {
+  class_price: number;
 }

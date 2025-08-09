@@ -25,7 +25,7 @@ export const PrimaryButton = ({
   const styles = createStyles(theme);
   return (
     <LinearGradient
-      colors={["#4f8cff", "#1cb5e0"]}
+      colors={["#4F46E5", "#7C3AED"]} // colors={["#4f8cff", "#1cb5e0"]} //colors={["#1cb5e0", "#063159"]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
       style={[styles.appButton.gradient, style]}
@@ -62,5 +62,56 @@ export const SecondaryButton = ({
         {title}
       </AppText>
     </TouchableOpacity>
+  );
+};
+
+export const SmallSecondaryButton = ({
+  title,
+  onPress,
+  style,
+  textStyle,
+  theme,
+}: Props) => {
+  const styles = createStyles(theme);
+  return (
+    <TouchableOpacity
+      style={[styles.appButton.smallSecondaryButton, style]}
+      onPress={onPress}
+      activeOpacity={0.7}
+    >
+      <AppText style={[styles.appButton.smallSecondaryButtonText, textStyle]}>
+        {title}
+      </AppText>
+    </TouchableOpacity>
+  );
+};
+
+export const DeleteButton = ({
+  title,
+  onPress,
+  style,
+  textStyle,
+  disabled,
+  theme,
+}: Props) => {
+  const styles = createStyles(theme);
+  return (
+    <LinearGradient
+      colors={["#DC2626", "#B91C1C"]} // أحمر غامق للتدرج
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+      style={[styles.appButton.deleteButtonGradient, style]}
+    >
+      <TouchableOpacity
+        style={styles.appButton.deleteButton}
+        onPress={onPress}
+        activeOpacity={0.85}
+        disabled={disabled}
+      >
+        <AppText style={[styles.appButton.deleteButtonText, textStyle]}>
+          {title}
+        </AppText>
+      </TouchableOpacity>
+    </LinearGradient>
   );
 };

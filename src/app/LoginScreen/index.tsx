@@ -46,9 +46,8 @@ const LoginScreen = () => {
 
   const [isStudent, setIsStudent] = useState<boolean>(true);
   const [response, setResponse] = useState<string>("");
-  const [isLoginLoading, setIsLoginLoading] = useState(false); // حالة loading منفصلة للـ login
+  const [isLoginLoading, setIsLoginLoading] = useState(false);
 
-  //remove later
   useEffect(() => {
     const debugToken = async () => {
       const token = await AsyncStorage.getItem("access_token");
@@ -61,7 +60,7 @@ const LoginScreen = () => {
   }, []);
 
   const handlePhoneRegister = () => {
-    router.push("/(tabs)/studentRegisteration");
+    router.push("/StudentRegisterScreen");
   };
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
@@ -70,7 +69,7 @@ const LoginScreen = () => {
       ...prev,
       [field]: undefined,
     }));
-    setResponse(""); // مسح رسالة الخطأ عند التعديل
+    setResponse("");
   };
 
   const validateForm = () => {
@@ -92,7 +91,7 @@ const LoginScreen = () => {
     if (!validateForm()) return;
 
     setIsLoginLoading(true);
-    setResponse(""); // مسح أي رسائل خطأ سابقة
+    setResponse("");
 
     try {
       const res: LoginResponse = await login(
@@ -102,20 +101,19 @@ const LoginScreen = () => {
       );
 
       if (res.access_token) {
-        router.replace("/"); // استخدام replace بدلاً من push
+        router.replace("/");
       } else {
-        setResponse(t("loginError") || "فشل تسجيل الدخول");
+        setResponse(t("loginError"));
       }
     } catch (error: any) {
       console.log("Login error:", error);
 
-      // التعامل مع رسائل الخطأ المختلفة
       if (error?.message) {
         setResponse(error.message);
       } else if (error?.response?.data?.message) {
         setResponse(error.response.data.message);
       } else {
-        setResponse(t("loginError") || "حدث خطأ أثناء تسجيل الدخول");
+        setResponse(t("loginError"));
       }
     } finally {
       setIsLoginLoading(false);
@@ -132,7 +130,7 @@ const LoginScreen = () => {
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
+        style={{ flex: 1, paddingHorizontal: 20 }}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -141,9 +139,10 @@ const LoginScreen = () => {
             keyboardShouldPersistTaps="handled"
           >
             <View style={styles.homeScreen.descriptionContainer} />
+
             <View style={styles.homeScreen.signupContainer}>
               <AppText style={styles.registerScreen.label}>
-                {isStudent ? "طالب" : "معلم"}
+                {isStudent ? t("student") : t("teacher")}
               </AppText>
               <Switch
                 value={isStudent}
@@ -199,9 +198,7 @@ const LoginScreen = () => {
             </View>
 
             <PrimaryButton
-              title={
-                isLoginLoading ? t("loading") || "جاري التحميل..." : t("login")
-              }
+              title={isLoginLoading ? t("loading") : t("login")}
               onPress={handleLogin}
               theme={theme}
               textStyle={styles.whiteAndBlackText.whiteText}
@@ -232,18 +229,7 @@ const LoginScreen = () => {
       </KeyboardAvoidingView>
 
       {isLoginLoading && (
-        <View
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0,0,0,0.3)",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
+        <View style={styles.homeScreen.loadingView}>
           <LoadingView isLoading={true} />
         </View>
       )}

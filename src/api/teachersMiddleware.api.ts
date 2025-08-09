@@ -1,6 +1,8 @@
 import {
+  MultiRegistrationRequest,
   RegistrationItem,
   RegistrationRequest,
+  SingleRegistrationRequest,
   TeacherBookingsResponse,
   TeacherClassesResponse,
   TeacherProfileRequest,
@@ -10,7 +12,7 @@ import {
 import api from ".";
 
 export const getProfile = async (): Promise<TeacherProfileResponse> => {
-  const response = await api.get("/teacher/profile");
+  const response = await api.get("/api/teacher/profile");
 
   const { data } = response.data;
   return data as TeacherProfileResponse;
@@ -19,7 +21,7 @@ export const getProfile = async (): Promise<TeacherProfileResponse> => {
 export const updateProfile = async (
   request: TeacherProfileRequest
 ): Promise<TeacherProfileResponse> => {
-  const response = await api.put("/teacher/profile", request);
+  const response = await api.put("/api/teacher/profile", request);
 
   const { data } = response.data;
 
@@ -37,7 +39,7 @@ export const uploadTeacherProfileImage = async (
     type: "image/jpeg",
   } as any);
 
-  const response = await api.post("/teacher/profile/image", formData, {
+  const response = await api.post("/api/teacher/profile/image", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -47,14 +49,14 @@ export const uploadTeacherProfileImage = async (
 };
 
 export const getTeacherClasses = async (): Promise<TeacherClassesResponse> => {
-  const response = await api.get("/teacher/classes");
+  const response = await api.get("/api/teacher/classes");
 
   return response.data as TeacherClassesResponse;
 };
 
 export const getTeacherRegistrations =
   async (): Promise<TeacherRegistrationsResponse> => {
-    const response = await api.get("/teacher/registrations");
+    const response = await api.get("/api/teacher/registrations");
 
     return response.data as TeacherRegistrationsResponse;
   };
@@ -64,7 +66,7 @@ export const updateTeacherRegistrationPrice = async (
   request: RegistrationRequest
 ): Promise<RegistrationItem> => {
   const response = await api.put(
-    `/teacher/registrations/${registrationId}`,
+    `/api/teacher/registrations/${registrationId}`,
     request
   );
 
@@ -72,12 +74,34 @@ export const updateTeacherRegistrationPrice = async (
   return data as RegistrationItem;
 };
 
+export const TeacherMultipleRegistrations = async (
+  request: MultiRegistrationRequest
+): Promise<string> => {
+  const response = await api.post("/api/teacher/classes/register", request);
+
+  const { data } = response.data;
+  return data as string;
+};
+
+export const TeacherSingleRegistration = async (
+  request: SingleRegistrationRequest,
+  classId: number
+): Promise<string> => {
+  const response = await api.post(
+    `/api/teacher/classes/${classId}/register`,
+    request
+  );
+
+  const { data } = response.data;
+  return data as string;
+};
+
 export const deleteTeacherRegistration = async (
   registrationId: number,
   request: RegistrationRequest
 ): Promise<{ message: string }> => {
   const response = await api.delete(
-    `/teacher/registrations/${registrationId}`,
+    `/api/teacher/registrations/${registrationId}`,
     {
       data: request, // axios يسمح بإرسال body في delete من خلال config.data
     }
@@ -88,7 +112,7 @@ export const deleteTeacherRegistration = async (
 
 export const getTeacherBookings =
   async (): Promise<TeacherBookingsResponse> => {
-    const response = await api.get("/teacher/bookings");
+    const response = await api.get("/api/teacher/bookings");
 
     return response.data as TeacherBookingsResponse;
   };

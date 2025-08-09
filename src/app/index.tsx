@@ -1,5 +1,6 @@
 // @ts-ignore
-import Logo from "@/assets/images/icon.png";
+import Logo from "@/assets/images/icon.webp";
+// @ts-ignore
 import { PrimaryButton } from "@/components/AppButton";
 import AppText from "@/components/AppText";
 import { useTheme } from "@/context/ThemeContext";
@@ -8,7 +9,7 @@ import { createStyles } from "@/styles";
 import { UserType } from "@/types/api";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Image,
@@ -26,29 +27,41 @@ const HomeScreen = () => {
   const { user } = useUser();
 
   const handleBooking = () => {
-    router.push("/(tabs)/booking");
+    router.push("/StudentBookingScreen");
   };
 
-  const handleIconPress = () => {
+  const handleIconPress = useCallback(() => {
     if (user) {
       if (user.type === UserType.student) {
-        router.push("/(tabs)/profile");
+        router.push("/StudentProfileScreen");
       } else {
-        router.push("/(tabs)/teacherProfile");
+        router.push("/TeacherProfileScreen");
       }
     } else {
-      router.push("/(tabs)/loginScreen");
+      router.push("/LoginScreen");
     }
-  };
+  }, [user]);
 
   const handleRegistrations = () => {
-    router.push("/(tabs)/teacherRegistrations");
+    router.push("/TeacherBookingScreen");
   };
 
   return (
     <SafeAreaView style={styles.homeScreen.container}>
+      {/* <LinearGradient
+        colors={["#4F46E5", "#7C3AED"]}
+        style={[styles.teacherInfoModalStyles.scrollView]}
+      > */}
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-
+      {/* <View
+        style={{
+          flex: 1,
+          backgroundColor: "rgba(255, 255, 255, 0.5)", // شفاف أبيض
+          borderRadius: 20,
+          padding: 10,
+          margin: 10,
+        }}
+      > */}
       <TouchableOpacity
         onPress={handleIconPress}
         style={styles.homeScreen.iconContainer}
@@ -64,7 +77,7 @@ const HomeScreen = () => {
         <View style={styles.homeScreen.logoPlaceholder}>
           <Image
             source={Logo}
-            style={{ width: 100, height: 100, resizeMode: "contain" }}
+            style={styles.homeScreen.imageStyle}
             accessibilityLabel="App Logo"
           />
         </View>
@@ -74,9 +87,6 @@ const HomeScreen = () => {
             {t("Hello")} {user?.name || t("welcomeGuest")},
           </AppText>
           <AppText style={styles.registerScreen.title}>{t("welcome")}</AppText>
-          <AppText style={styles.homeScreen.descriptionText}>
-            {t("slug") || "احجز حصتك الآن بسهولة وسرعة"}
-          </AppText>
           <AppText style={styles.homeScreen.subDescriptionText}>
             {t("slugDesc")}
           </AppText>
@@ -84,12 +94,14 @@ const HomeScreen = () => {
       </View>
 
       <View style={styles.homeScreen.contactContainer}>
-        <PrimaryButton
-          title={t("booknow")}
-          onPress={handleBooking}
-          theme={theme}
-          textStyle={styles.whiteAndBlackText.whiteText}
-        />
+        {user?.type === UserType.student && (
+          <PrimaryButton
+            title={t("booknow")}
+            onPress={handleBooking}
+            theme={theme}
+            textStyle={styles.whiteAndBlackText.whiteText}
+          />
+        )}
         {user?.type === UserType.teacher && (
           <PrimaryButton
             title={t("viewRegisterations")}
@@ -99,6 +111,8 @@ const HomeScreen = () => {
           />
         )}
       </View>
+      {/* </View> */}
+      {/* </LinearGradient> */}
     </SafeAreaView>
   );
 };
