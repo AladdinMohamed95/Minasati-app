@@ -1895,6 +1895,99 @@ export const createStyles = (theme: Theme) => {
     },
   });
 
+  const teacherRegisterationStyles = StyleSheet.create({
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      justifyContent: "center" as const,
+      alignItems: "center" as const,
+      padding: 20,
+    },
+    modalContainer: {
+      backgroundColor: "white",
+      borderRadius: 15,
+      padding: 20,
+      width: "100%",
+      maxWidth: 400,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5,
+    },
+    textInputStyle: {
+      borderWidth: 1,
+      borderColor: "#ccc",
+      borderRadius: 8,
+      padding: 12,
+      fontSize: 16,
+      backgroundColor: "#fff",
+      textAlign: "right" as const,
+    },
+    modalButton: {
+      flex: 1,
+      paddingVertical: 12,
+      borderRadius: 8,
+    },
+    emptyContainer: {
+      paddingVertical: 20,
+      backgroundColor: "#f9f9f9",
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: "#e0e0e0",
+    },
+    pendingItemStyle: {
+      flexDirection: "row" as const,
+      alignItems: "center" as const,
+      padding: 15,
+      backgroundColor: "#f0f8ff",
+      borderRadius: 8,
+      marginBottom: 10,
+      borderWidth: 1,
+      borderColor: "#007bff",
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+    registrationItemStyle: {
+      flexDirection: "row" as const,
+      alignItems: "center" as const,
+      padding: 15,
+      backgroundColor: "#fff",
+      borderRadius: 8,
+      marginBottom: 8,
+      borderWidth: 1,
+      borderColor: "#eee",
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 1,
+      elevation: 1,
+    },
+    deleteButton: {
+      backgroundColor: "#dc3545",
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      borderRadius: 6,
+      marginLeft: 10,
+    },
+    updateButton: {
+      backgroundColor: "#28a745",
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      borderRadius: 6,
+      marginLeft: 10,
+    },
+    submitButton: {
+      backgroundColor: "#7C3AED",
+      paddingVertical: 15,
+      borderRadius: 8,
+      marginTop: 15,
+    },
+  });
+
   return {
     //----------------------------------------------------------------------------------------------------------home screen
     homeScreen: homeScreenStyles,
@@ -1924,5 +2017,7 @@ export const createStyles = (theme: Theme) => {
     studentBookingViewStyles: studentBookingScreenStyles,
     //----------------------------------------------------------------------------------------------------------teacher info modal Screen Styles
     teacherInfoModalStyles: teacherInfoModalStyles,
+    //----------------------------------------------------------------------------------------------------------teacher Registeration modal Screen Styles
+    teacherRegisterationStyles: teacherRegisterationStyles,
   };
 };

@@ -74,7 +74,6 @@ export const teacherLogin = async (
   request: LoginRequest
 ): Promise<LoginResponse> => {
   const response = await api.post("/api/teacher/login", request);
-  console.log("teacherLogin response", JSON.stringify(response));
   const data: LoginResponse = response.data;
   if (data.access_token) {
     await AsyncStorage.setItem("access_token", data.access_token);

@@ -254,6 +254,8 @@ export interface PendingRegistration {
   class_id: number;
   class_name: string;
   class_price: string;
+  academic_year: string;
+  academic_stage: string;
 }
 
 export interface MultiRegistrationRequest {

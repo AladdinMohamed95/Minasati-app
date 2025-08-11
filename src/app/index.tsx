@@ -42,26 +42,17 @@ const HomeScreen = () => {
     }
   }, [user]);
 
-  const handleRegistrations = () => {
-    router.push("/TeacherBookingScreen");
+  const handleViewRegistrations = () => {
+    router.push("/TeacherBookingViewScreen");
+  };
+
+  const handleAddRegistrations = () => {
+    router.push("/TeacherRegistrationsScreen");
   };
 
   return (
     <SafeAreaView style={styles.homeScreen.container}>
-      {/* <LinearGradient
-        colors={["#4F46E5", "#7C3AED"]}
-        style={[styles.teacherInfoModalStyles.scrollView]}
-      > */}
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      {/* <View
-        style={{
-          flex: 1,
-          backgroundColor: "rgba(255, 255, 255, 0.5)", // شفاف أبيض
-          borderRadius: 20,
-          padding: 10,
-          margin: 10,
-        }}
-      > */}
       <TouchableOpacity
         onPress={handleIconPress}
         style={styles.homeScreen.iconContainer}
@@ -94,7 +85,7 @@ const HomeScreen = () => {
       </View>
 
       <View style={styles.homeScreen.contactContainer}>
-        {user?.type === UserType.student && (
+        {user?.type !== UserType.teacher && (
           <PrimaryButton
             title={t("booknow")}
             onPress={handleBooking}
@@ -103,16 +94,22 @@ const HomeScreen = () => {
           />
         )}
         {user?.type === UserType.teacher && (
-          <PrimaryButton
-            title={t("viewRegisterations")}
-            onPress={handleRegistrations}
-            theme={theme}
-            textStyle={styles.whiteAndBlackText.whiteText}
-          />
+          <>
+            <PrimaryButton
+              title={t("viewRegisterations")}
+              onPress={handleViewRegistrations}
+              theme={theme}
+              textStyle={styles.whiteAndBlackText.whiteText}
+            />
+            <PrimaryButton
+              title={t("addClass")}
+              onPress={handleAddRegistrations}
+              theme={theme}
+              textStyle={styles.whiteAndBlackText.whiteText}
+            />
+          </>
         )}
       </View>
-      {/* </View> */}
-      {/* </LinearGradient> */}
     </SafeAreaView>
   );
 };

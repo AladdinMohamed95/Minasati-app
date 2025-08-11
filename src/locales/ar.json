@@ -45,7 +45,7 @@
   "cancel": "إلغاء",
 
   "accountInfo": "معلومات الحساب",
-  "teacherInfo": "بيانات المدرس",
+  "teacherInfo": "بيانات المعلم",
   "type": "نوع المستخدم",
   "registeredAt": "تاريخ التسجيل",
   "updatedAt": "تاريخ التحديث",
@@ -109,7 +109,7 @@
   "educationLevel": "المستوى التعليمي",
   "email": "البريد الإلكتروني",
   "parentPhoneNumber": "رقم هاتف ولي الأمر",
-  "schoolName": "اسم المدرسة/الجامعة",
+  "schoolName": "اسم المعلمة/الجامعة",
 
   "teachersScreen": {
     "headerTitle": "معلمونا",
@@ -135,20 +135,22 @@
 
   "booknow": "احجز الان",
   "viewRegisterations": "عرض الحجوزات",
+  "addClass": "إضافة مادة",
   "noBookings": "لا يوجد حجوزات",
   "currentBookings": "الحجوزات الحالية",
   "seq": "م",
-  "teacher": "مدرس",
+  "teacher": "معلم",
   "student": "طالب",
   "class": "الفصل",
   "time": "الوقت",
   "action": "إجراء",
   "newBooking": "حجز جديد",
-  "chooseTeacher": "اختر مدرس:",
+  "chooseTeacher": "اختر معلم:",
   "chooseClass": "اختر فصل:",
   "chooseTime": "وقت الحجز",
   "bookingInProgress": "جاري الحجز...",
   "confirmBooking": "تأكيد الحجز",
 
-  "pleaseLogin": "برجاء تسجيل الدخول لتتمكن من الحجز"
+  "pleaseLogin": "برجاء تسجيل الدخول لتتمكن من الحجز",
+  "teacherClassRegistration": "تسجيل المواد"
 }

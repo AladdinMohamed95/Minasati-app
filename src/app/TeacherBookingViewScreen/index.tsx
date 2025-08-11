@@ -1,10 +1,9 @@
-import { deleteBooking, getBookings } from "@/api/studentsMiddleware.api";
+import { getTeacherBookings } from "@/api/teachersMiddleware.api";
 import AppText from "@/components/AppText";
 import { useTheme } from "@/context/ThemeContext";
 import { createStyles } from "@/styles";
-import { Booking } from "@/types/api";
+import { BookingItem } from "@/types/api";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -12,16 +11,15 @@ import {
   SafeAreaView,
   ScrollView,
   StatusBar,
-  TouchableOpacity,
   View,
 } from "react-native";
-import RenderBookingCard from "../modals/bookingCard";
+import TeacherBookingCard from "../modals/teacherBookingCard";
 
-export default function BookingScreen() {
+export default function TeacherBookingViewScreen() {
   const { theme } = useTheme();
   const styles = createStyles(theme);
 
-  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [bookings, setBookings] = useState<BookingItem[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -31,7 +29,7 @@ export default function BookingScreen() {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const response = await getBookings();
+      const response = await getTeacherBookings();
 
       // Handle response structure - extract data array
       const bookingsData = response;
@@ -43,29 +41,6 @@ export default function BookingScreen() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDeleteBooking = async (bookingId: number) => {
-    Alert.alert("تأكيد الحذف", "هل أنت متأكد من حذف هذا الحجز؟", [
-      { text: "إلغاء", style: "cancel" },
-      {
-        text: "حذف",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await deleteBooking(bookingId);
-            fetchBookings();
-            Alert.alert("تم الحذف", "تم حذف الحجز بنجاح");
-          } catch (error) {
-            Alert.alert("خطأ", "حدث خطأ أثناء حذف الحجز");
-          }
-        },
-      },
-    ]);
-  };
-
-  const handleBookNow = () => {
-    router.push("/StudentBookingScreen");
   };
 
   return (
@@ -88,17 +63,6 @@ export default function BookingScreen() {
             <AppText style={styles.bookingViewStyles.emptyTitle}>
               لا توجد حجوزات
             </AppText>
-            <AppText style={styles.bookingViewStyles.emptySubtitle}>
-              لم تقم بحجز أي حصص دراسية بعد
-            </AppText>
-            <TouchableOpacity
-              style={styles.bookingViewStyles.emptyButton}
-              onPress={handleBookNow}
-            >
-              <AppText style={styles.bookingViewStyles.emptyButtonText}>
-                احجز حصتك الأولى
-              </AppText>
-            </TouchableOpacity>
           </View>
         ) : (
           <View style={styles.bookingViewStyles.bookingsContainer}>
@@ -106,10 +70,15 @@ export default function BookingScreen() {
               إجمالي الحجوزات: {bookings.length}
             </AppText>
             {bookings.map((booking, index) => (
-              <RenderBookingCard
+              <TeacherBookingCard
                 key={index}
                 booking={booking}
-                handleDeleteBooking={handleDeleteBooking}
+                handleUpdateBookingStatus={(booking_id, status) => {
+                  // handle status update
+                }}
+                handleDeleteBooking={(booking_id) => {
+                  // handle delete
+                }}
               />
             ))}
           </View>

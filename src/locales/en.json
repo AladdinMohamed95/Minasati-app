@@ -134,6 +134,7 @@
 
   "booknow": "Book now",
   "viewRegisterations": "View Registerations",
+  "addClass": "Add Class",
   "noBookings": "No Bookings",
   "currentBookings": "Current Bookings",
   "seq": "Seq",
@@ -149,5 +150,6 @@
   "bookingInProgress": "Booking In Progress...",
   "confirmBooking": "Confirm Booking",
 
-  "pleaseLogin": "Please login to continue"
+  "pleaseLogin": "Please login to continue",
+  "teacherClassRegistration": "Teacher Class Registration"
 }

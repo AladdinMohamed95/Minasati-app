@@ -26,7 +26,6 @@ export const updateProfile = async (
 
 export const getBookings = async (): Promise<Booking[]> => {
   const response = await api.get("/api/student/bookings");
-  console.log("bookings response:", response.data);
   return response.data.data as Booking[]; // <-- استخدم .data.data
 };
 

@@ -1,9 +1,9 @@
 import {
+  BookingItem,
   MultiRegistrationRequest,
   RegistrationItem,
   RegistrationRequest,
   SingleRegistrationRequest,
-  TeacherBookingsResponse,
   TeacherClassesResponse,
   TeacherProfileRequest,
   TeacherProfileResponse,
@@ -50,14 +50,14 @@ export const uploadTeacherProfileImage = async (
 
 export const getTeacherClasses = async (): Promise<TeacherClassesResponse> => {
   const response = await api.get("/api/teacher/classes");
-
+  console.log("getTeacherClasses: " + response.data.data);
   return response.data as TeacherClassesResponse;
 };
 
 export const getTeacherRegistrations =
   async (): Promise<TeacherRegistrationsResponse> => {
     const response = await api.get("/api/teacher/registrations");
-
+    console.log("getTeacherRegistrations: " + response.data);
     return response.data as TeacherRegistrationsResponse;
   };
 
@@ -78,7 +78,7 @@ export const TeacherMultipleRegistrations = async (
   request: MultiRegistrationRequest
 ): Promise<string> => {
   const response = await api.post("/api/teacher/classes/register", request);
-
+  console.log("TeacherMultipleRegistrations", response.data);
   const { data } = response.data;
   return data as string;
 };
@@ -110,9 +110,7 @@ export const deleteTeacherRegistration = async (
   return response.data as { message: string };
 };
 
-export const getTeacherBookings =
-  async (): Promise<TeacherBookingsResponse> => {
-    const response = await api.get("/api/teacher/bookings");
-
-    return response.data as TeacherBookingsResponse;
-  };
+export const getTeacherBookings = async (): Promise<BookingItem[]> => {
+  const response = await api.get("/api/teacher/bookings");
+  return response.data.data as BookingItem[];
+};
