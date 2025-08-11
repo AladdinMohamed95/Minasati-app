@@ -79,7 +79,7 @@
 //         await getTeacherRegistrations();
 //       setTeacherRegistrations(response.data);
 //     } catch (error) {
-//       console.log("خطأ في جلب تسجيلات المدرس:", error);
+//       console.log("خطأ في جلب تسجيلات المعلم:", error);
 //       setResponseMessage("خطأ في جلب التسجيلات");
 //     }
 //   };
@@ -116,6 +116,8 @@
 //       class_id: selectedClassId,
 //       class_name: selectedClass?.name || `مادة ${selectedClassId}`,
 //       class_price: classPrice,
+//       academic_year: "",
+//       academic_stage: "",
 //     };
 
 //     setPendingRegistrations((prev) => [...prev, newRegistration]);
@@ -563,464 +565,1441 @@
 //   );
 // }
 
+// import {
+//   getTeacherRegistrations,
+//   TeacherMultipleRegistrations,
+//   updateTeacherRegistrationPrice,
+// } from "@/api/teachersMiddleware.api";
+// import { PrimaryButton } from "@/components/AppButton";
+// import AppText from "@/components/AppText";
+// import { useTheme } from "@/context/ThemeContext";
+// import { createStyles } from "@/styles";
+// import { getFontWeight } from "@/theme";
+// import { PendingRegistration, RegistrationItem } from "@/types/api";
+// import React, { useEffect, useState } from "react";
+// import { useTranslation } from "react-i18next";
+// import {
+//   Alert,
+//   SafeAreaView,
+//   ScrollView,
+//   StatusBar,
+//   TouchableOpacity,
+//   View,
+// } from "react-native";
+// import ClassModal from "../modals/classModal";
+
+// export default function TeacherBookingScreen() {
+//   const { t } = useTranslation();
+//   const { theme } = useTheme();
+//   const styles = createStyles(theme);
+
+//   const [registrations, setRegistrations] = useState<RegistrationItem[]>([]);
+//   const [pendingClasses, setPendingClasses] = useState<PendingRegistration[]>(
+//     []
+//   );
+
+//   // حالات UI
+//   const [loading, setLoading] = useState(false);
+//   const [message, setMessage] = useState("");
+//   const [showModal, setShowModal] = useState(false);
+
+//   // نموذج إضافة/تحديث
+//   const [classNameInput, setClassNameInput] = useState("");
+//   const [priceInput, setPriceInput] = useState("");
+//   const [editingRegId, setEditingRegId] = useState<number | null>(null);
+
+//   useEffect(() => {
+//     fetchRegistrations();
+//   }, []);
+
+//   const fetchRegistrations = async () => {
+//     setLoading(true);
+//     try {
+//       const response = await getTeacherRegistrations();
+//       setRegistrations(response.data || []);
+//     } catch (error: any) {
+//       showMessage("خطأ في جلب البيانات: " + (error?.message || error), true);
+//     }
+//     setLoading(false);
+//   };
+
+//   const showMessage = (text: string, isError = false) => {
+//     setMessage(text);
+//     setTimeout(() => setMessage(""), 4000);
+//   };
+
+//   const isDuplicateClass = (className: string) => {
+//     const normalizedName = className.trim().toLowerCase();
+//     return (
+//       registrations.some(
+//         (reg) => reg.class_name?.toLowerCase() === normalizedName
+//       ) ||
+//       pendingClasses.some(
+//         (pending) => pending.class_name.toLowerCase() === normalizedName
+//       )
+//     );
+//   };
+
+//   const addPendingClass = () => {
+//     const className = classNameInput.trim();
+//     const price = parseFloat(priceInput.trim());
+
+//     // التحقق من صحة البيانات
+//     if (!className) {
+//       showMessage("يرجى كتابة اسم المادة", true);
+//       return;
+//     }
+
+//     if (!priceInput.trim()) {
+//       showMessage("يرجى إدخال السعر", true);
+//       return;
+//     }
+
+//     if (isNaN(price) || price <= 0) {
+//       showMessage("يرجى إدخال سعر صحيح أكبر من صفر", true);
+//       return;
+//     }
+
+//     // التحقق من التكرار
+//     if (isDuplicateClass(className)) {
+//       showMessage("هذه المادة موجودة بالفعل", true);
+//       return;
+//     }
+
+//     const newPending: PendingRegistration = {
+//       id: Date.now().toString(),
+//       class_id: Date.now(), // استخدام timestamp كـ ID مؤقت
+//       class_name: className,
+//       class_price: price.toString(),
+//       academic_year: "",
+//       academic_stage: "",
+//     };
+
+//     setPendingClasses([...pendingClasses, newPending]);
+//     resetModal();
+//     showMessage(`تم إضافة "${className}" للقائمة`);
+//   };
+
+//   // حذف من القائمة المؤقتة
+//   const removePending = (id: string) => {
+//     const item = pendingClasses.find((p) => p.id === id);
+//     setPendingClasses(pendingClasses.filter((p) => p.id !== id));
+//     if (item) {
+//       showMessage(`تم حذف "${item.class_name}" من القائمة`);
+//     }
+//   };
+
+//   // تسجيل المواد
+//   const submitRegistrations = () => {
+//     if (pendingClasses.length === 0) {
+//       showMessage("لا توجد مواد للتسجيل", true);
+//       return;
+//     }
+
+//     Alert.alert(
+//       "تأكيد التسجيل",
+//       `هل أنت متأكد من تسجيل ${pendingClasses.length} مادة؟`,
+//       [
+//         { text: "إلغاء", style: "cancel" },
+//         { text: "تأكيد", onPress: processRegistrations },
+//       ]
+//     );
+//   };
+
+//   const processRegistrations = async () => {
+//     setLoading(true);
+//     try {
+//       const registrations = pendingClasses.map((p) => ({
+//         class_id: p.class_id,
+//         class_name: p.class_name, // إرسال اسم المادة الجديدة
+//         class_price: parseFloat(p.class_price),
+//       }));
+
+//       await TeacherMultipleRegistrations({ registrations });
+//       setPendingClasses([]);
+//       showMessage(`تم تسجيل ${registrations.length} مادة بنجاح`);
+//       fetchRegistrations();
+//     } catch (error: any) {
+//       showMessage("فشل في التسجيل: " + (error?.message || error), true);
+//     }
+//     setLoading(false);
+//   };
+
+//   // تحديث السعر
+//   const updatePrice = async () => {
+//     const price = parseFloat(priceInput.trim());
+
+//     if (!priceInput.trim()) {
+//       showMessage("يرجى إدخال السعر", true);
+//       return;
+//     }
+
+//     if (isNaN(price) || price <= 0) {
+//       showMessage("يرجى إدخال سعر صحيح أكبر من صفر", true);
+//       return;
+//     }
+
+//     setLoading(true);
+//     try {
+//       await updateTeacherRegistrationPrice(editingRegId!, {
+//         class_price: price,
+//       });
+//       showMessage("تم تحديث السعر بنجاح");
+//       fetchRegistrations();
+//       resetModal();
+//     } catch (error: any) {
+//       showMessage("فشل في التحديث: " + (error?.message || error), true);
+//     }
+//     setLoading(false);
+//   };
+
+//   // إعادة تعيين المودال
+//   const resetModal = () => {
+//     setShowModal(false);
+//     setClassNameInput("");
+//     setPriceInput("");
+//     setEditingRegId(null);
+//   };
+
+//   // فتح مودال التحديث
+//   const openUpdateModal = (regId: number, currentPrice: string) => {
+//     setEditingRegId(regId);
+//     setPriceInput(currentPrice);
+//     setShowModal(true);
+//   };
+
+//   // فتح مودال الإضافة
+//   const openAddModal = () => {
+//     setEditingRegId(null);
+//     setClassNameInput("");
+//     setPriceInput("");
+//     setShowModal(true);
+//   };
+
+//   return (
+//     <SafeAreaView style={styles.homeScreen.container}>
+//       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+
+//       {/* العنوان */}
+//       <View style={styles.homeScreen.contactContainer}>
+//         <AppText style={styles.homeScreen.descriptionText}>
+//           {t("teacherClassRegistration")}
+//         </AppText>
+//       </View>
+
+//       <View style={styles.homeScreen.contactContainer}>
+//         <PrimaryButton
+//           title="إضافة مادة جديدة"
+//           onPress={openAddModal}
+//           theme={theme}
+//           textStyle={styles.whiteAndBlackText.whiteText}
+//         />
+//       </View>
+
+//       {message && (
+//         <View style={{ margin: 16 }}>
+//           <AppText
+//             style={{
+//               textAlign: "center",
+//               padding: 15,
+//               backgroundColor:
+//                 message.includes("فشل") || message.includes("خطأ")
+//                   ? "#f8d7da"
+//                   : "#d1ecf1",
+//               borderRadius: 8,
+//               color:
+//                 message.includes("فشل") || message.includes("خطأ")
+//                   ? "#721c24"
+//                   : "#0c5460",
+//               fontSize: 14,
+//             }}
+//           >
+//             {message}
+//           </AppText>
+//         </View>
+//       )}
+
+//       <ScrollView
+//         style={{ flex: 1, paddingHorizontal: 16 }}
+//         showsVerticalScrollIndicator={false}
+//       >
+//         <View style={{ marginTop: 20 }}>
+//           <AppText
+//             style={{
+//               fontSize: 18,
+//               fontWeight: getFontWeight(theme.fontWeight.bold),
+//               marginBottom: 10,
+//             }}
+//           >
+//             المواد المضافة ({pendingClasses.length})
+//           </AppText>
+
+//           {pendingClasses.length === 0 ? (
+//             <View style={styles.teacherRegisterationStyles.emptyContainer}>
+//               <AppText style={{ textAlign: "center", color: "#888" }}>
+//                 لم يتم إضافة أي مواد بعد
+//               </AppText>
+//             </View>
+//           ) : (
+//             <>
+//               {pendingClasses.map((item) => (
+//                 <View
+//                   key={item.id}
+//                   style={styles.teacherRegisterationStyles.pendingItemStyle}
+//                 >
+//                   <View style={{ flex: 1 }}>
+//                     <AppText
+//                       style={{
+//                         fontWeight: getFontWeight(theme.fontWeight.bold),
+//                         fontSize: 16,
+//                       }}
+//                     >
+//                       {item.class_name}
+//                     </AppText>
+//                     <AppText
+//                       style={{
+//                         fontSize: 14,
+//                         color: "#7C3AED",
+//                         fontWeight: getFontWeight(theme.fontWeight.bold),
+//                         marginTop: 4,
+//                       }}
+//                     >
+//                       {item.class_price}
+//                     </AppText>
+//                   </View>
+//                   <TouchableOpacity
+//                     style={styles.teacherRegisterationStyles.deleteButton}
+//                     onPress={() => removePending(item.id)}
+//                   >
+//                     <AppText
+//                       style={{
+//                         color: "white",
+//                         fontSize: 12,
+//                         fontWeight: getFontWeight(theme.fontWeight.bold),
+//                       }}
+//                     >
+//                       حذف
+//                     </AppText>
+//                   </TouchableOpacity>
+//                 </View>
+//               ))}
+//               <TouchableOpacity
+//                 style={[
+//                   styles.teacherRegisterationStyles.submitButton,
+//                   { opacity: loading ? 0.6 : 1 },
+//                 ]}
+//                 onPress={submitRegistrations}
+//                 disabled={loading}
+//               >
+//                 <AppText
+//                   style={{
+//                     color: "white",
+//                     textAlign: "center",
+//                     fontWeight: getFontWeight(theme.fontWeight.bold),
+//                     fontSize: 16,
+//                   }}
+//                 >
+//                   {loading
+//                     ? "جاري التسجيل..."
+//                     : `تسجيل ${pendingClasses.length} مادة`}
+//                 </AppText>
+//               </TouchableOpacity>
+//             </>
+//           )}
+//         </View>
+
+//         {/* المواد المسجلة */}
+//         <View
+//           style={{
+//             marginTop: 30,
+//             marginBottom: 30,
+//           }}
+//         >
+//           <AppText
+//             style={{
+//               fontSize: 18,
+//               fontWeight: getFontWeight(theme.fontWeight.bold),
+//               marginBottom: 10,
+//             }}
+//           >
+//             المواد المسجلة ({registrations.length})
+//           </AppText>
+
+//           {loading && registrations.length === 0 ? (
+//             <View style={styles.teacherRegisterationStyles.emptyContainer}>
+//               <AppText style={{ textAlign: "center", color: "#888" }}>
+//                 جاري تحميل التسجيلات...
+//               </AppText>
+//             </View>
+//           ) : registrations.length === 0 ? (
+//             <View style={styles.teacherRegisterationStyles.emptyContainer}>
+//               <AppText style={{ textAlign: "center", color: "#888" }}>
+//                 لا يوجد تسجيلات
+//               </AppText>
+//             </View>
+//           ) : (
+//             registrations.map((reg, index) => (
+//               <View
+//                 key={reg.registration_id || index}
+//                 style={styles.teacherRegisterationStyles.registrationItemStyle}
+//               >
+//                 <View style={{ flex: 1 }}>
+//                   <AppText
+//                     style={{
+//                       fontWeight: getFontWeight(theme.fontWeight.bold),
+//                       fontSize: 16,
+//                     }}
+//                   >
+//                     {reg.class_name}
+//                   </AppText>
+//                   <AppText
+//                     style={{
+//                       fontSize: 12,
+//                       color:
+//                         reg.registration_status === "active"
+//                           ? "#28a745"
+//                           : reg.registration_status === "pending"
+//                           ? "#ffc107"
+//                           : "#dc3545",
+//                       marginTop: 2,
+//                       fontWeight: getFontWeight(theme.fontWeight.bold),
+//                     }}
+//                   >
+//                     {reg.registration_status === "active"
+//                       ? "نشط"
+//                       : reg.registration_status === "pending"
+//                       ? "في الانتظار"
+//                       : reg.registration_status}
+//                   </AppText>
+//                 </View>
+//                 <AppText
+//                   style={{
+//                     fontSize: 16,
+//                     fontWeight: getFontWeight(theme.fontWeight.bold),
+//                     color: "#7C3AED",
+//                     marginHorizontal: 10,
+//                   }}
+//                 >
+//                   {reg.class_price}
+//                 </AppText>
+//                 <TouchableOpacity
+//                   style={[
+//                     styles.teacherRegisterationStyles.updateButton,
+//                     { opacity: loading ? 0.6 : 1 },
+//                   ]}
+//                   onPress={() =>
+//                     openUpdateModal(
+//                       reg.registration_id,
+//                       reg.class_price?.toString() || "0"
+//                     )
+//                   }
+//                   disabled={loading}
+//                 >
+//                   <AppText
+//                     style={{
+//                       color: "white",
+//                       fontSize: 10,
+//                       fontWeight: getFontWeight(theme.fontWeight.bold),
+//                     }}
+//                   >
+//                     تحديث السعر
+//                   </AppText>
+//                 </TouchableOpacity>
+//               </View>
+//             ))
+//           )}
+//         </View>
+//       </ScrollView>
+
+//       {/* المودال الموحد */}
+//       <ClassModal
+//         visible={showModal}
+//         editingRegId={editingRegId}
+//         classNameInput={classNameInput}
+//         priceInput={priceInput}
+//         loading={loading}
+//         onClassNameChange={setClassNameInput}
+//         onPriceChange={setPriceInput}
+//         onCancel={resetModal}
+//         onSubmit={editingRegId ? updatePrice : addPendingClass}
+//       />
+//     </SafeAreaView>
+//   );
+// }
+
 import {
+  deleteTeacherRegistration,
+  getTeacherClasses,
   getTeacherRegistrations,
   TeacherMultipleRegistrations,
   updateTeacherRegistrationPrice,
 } from "@/api/teachersMiddleware.api";
-import { PrimaryButton } from "@/components/AppButton";
 import AppText from "@/components/AppText";
 import { useTheme } from "@/context/ThemeContext";
 import { createStyles } from "@/styles";
-import { getFontWeight } from "@/theme";
-import { PendingRegistration, RegistrationItem } from "@/types/api";
+import { AcademicYear, ClassItem, RegistrationItem } from "@/types/api";
+import { Ionicons } from "@expo/vector-icons";
+import { Picker } from "@react-native-picker/picker";
+import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Alert,
+  Dimensions,
+  Modal,
   SafeAreaView,
   ScrollView,
   StatusBar,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import ClassModal from "../modals/classModal";
+
+const { width } = Dimensions.get("window");
+
+interface PendingRegistration {
+  id: string;
+  class_id: number;
+  class_name: string;
+  class_price: string;
+  currency: string;
+  academic_context: AcademicYear | undefined;
+}
 
 export default function TeacherBookingScreen() {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const styles = createStyles(theme);
 
-  const [registrations, setRegistrations] = useState<RegistrationItem[]>([]);
-  const [pendingClasses, setPendingClasses] = useState<PendingRegistration[]>(
-    []
-  );
+  // البيانات الأساسية
+  const [availableClasses, setAvailableClasses] = useState<ClassItem[]>([]);
+  const [teacherRegistrations, setTeacherRegistrations] = useState<
+    RegistrationItem[]
+  >([]);
+  const [pendingRegistrations, setPendingRegistrations] = useState<
+    PendingRegistration[]
+  >([]);
+  const [responseMessage, setResponseMessage] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // حالات UI
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
-  const [showModal, setShowModal] = useState(false);
-
-  // نموذج إضافة/تحديث
-  const [classNameInput, setClassNameInput] = useState("");
-  const [priceInput, setPriceInput] = useState("");
-  const [editingRegId, setEditingRegId] = useState<number | null>(null);
+  // حالات المودال
+  const [addModalVisible, setAddModalVisible] = useState<boolean>(false);
+  const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
+  const [selectedSystemId, setSelectedSystemId] = useState<number>(0);
+  const [selectedStageId, setSelectedStageId] = useState<number>(0);
+  const [selectedYearId, setSelectedYearId] = useState<number>(0);
+  const [selectedClassId, setSelectedClassId] = useState<number>(0);
+  const [classPrice, setClassPrice] = useState<string>("");
+  const [classPriceCurrency, setClassPriceCurrency] = useState<string>("");
+  const [selectedRegistration, setSelectedRegistration] =
+    useState<RegistrationItem | null>(null);
 
   useEffect(() => {
-    fetchRegistrations();
+    loadData();
   }, []);
 
-  const fetchRegistrations = async () => {
-    setLoading(true);
+  // تحميل البيانات
+  const loadData = async () => {
     try {
-      const response = await getTeacherRegistrations();
-      setRegistrations(response.data || []);
-    } catch (error: any) {
-      showMessage("خطأ في جلب البيانات: " + (error?.message || error), true);
+      const [classesResponse, registrationsResponse] = await Promise.all([
+        getTeacherClasses(),
+        getTeacherRegistrations(),
+      ]);
+      setAvailableClasses(classesResponse.data);
+      setTeacherRegistrations(registrationsResponse.data);
+    } catch (error) {
+      setResponseMessage("خطأ في تحميل البيانات");
     }
-    setLoading(false);
   };
 
-  const showMessage = (text: string, isError = false) => {
-    setMessage(text);
-    setTimeout(() => setMessage(""), 4000);
-  };
-
-  const isDuplicateClass = (className: string) => {
-    const normalizedName = className.trim().toLowerCase();
-    return (
-      registrations.some(
-        (reg) => reg.class_name?.toLowerCase() === normalizedName
-      ) ||
-      pendingClasses.some(
-        (pending) => pending.class_name.toLowerCase() === normalizedName
-      )
-    );
-  };
-
-  const addPendingClass = () => {
-    const className = classNameInput.trim();
-    const price = parseFloat(priceInput.trim());
-
-    // التحقق من صحة البيانات
-    if (!className) {
-      showMessage("يرجى كتابة اسم المادة", true);
+  // إضافة مادة للقائمة المؤقتة
+  const addToPendingRegistrations = () => {
+    if (
+      !selectedSystemId ||
+      !selectedStageId ||
+      !selectedYearId ||
+      !selectedClassId ||
+      !classPrice
+    ) {
+      Alert.alert(
+        "خطأ",
+        "يرجى اختيار المادة والصف والمرحلة التعليمية والنظام التعليمي وإدخال السعر"
+      );
       return;
     }
 
-    if (!priceInput.trim()) {
-      showMessage("يرجى إدخال السعر", true);
-      return;
-    }
-
+    const price = parseFloat(classPrice);
     if (isNaN(price) || price <= 0) {
-      showMessage("يرجى إدخال سعر صحيح أكبر من صفر", true);
+      Alert.alert("خطأ", "يرجى إدخال سعر صحيح");
       return;
     }
 
-    // التحقق من التكرار
-    if (isDuplicateClass(className)) {
-      showMessage("هذه المادة موجودة بالفعل", true);
+    const isAlreadyAdded = pendingRegistrations.some(
+      (reg) => reg.class_id === selectedClassId
+    );
+
+    if (isAlreadyAdded) {
+      Alert.alert("تنبيه", "هذه المادة مضافة بالفعل");
       return;
     }
 
-    const newPending: PendingRegistration = {
+    const selectedClass = availableClasses.find(
+      (cls) => cls.id === selectedClassId
+    );
+
+    const newRegistration: PendingRegistration = {
       id: Date.now().toString(),
-      class_id: Date.now(), // استخدام timestamp كـ ID مؤقت
-      class_name: className,
-      class_price: price.toString(),
-      academic_year: "",
-      academic_stage: "",
+      class_id: selectedClassId,
+      class_name: selectedClass?.name || `مادة ${selectedClassId}`,
+      class_price: classPrice,
+      currency: classPriceCurrency,
+      academic_context: selectedClass?.academic_year,
     };
 
-    setPendingClasses([...pendingClasses, newPending]);
-    resetModal();
-    showMessage(`تم إضافة "${className}" للقائمة`);
+    setPendingRegistrations((prev) => [...prev, newRegistration]);
+    resetAddModal();
   };
 
-  // حذف من القائمة المؤقتة
-  const removePending = (id: string) => {
-    const item = pendingClasses.find((p) => p.id === id);
-    setPendingClasses(pendingClasses.filter((p) => p.id !== id));
-    if (item) {
-      showMessage(`تم حذف "${item.class_name}" من القائمة`);
-    }
+  // إزالة مادة من القائمة المؤقتة
+  const removePendingRegistration = (id: string) => {
+    setPendingRegistrations((prev) => prev.filter((reg) => reg.id !== id));
   };
 
-  // تسجيل المواد
-  const submitRegistrations = () => {
-    if (pendingClasses.length === 0) {
-      showMessage("لا توجد مواد للتسجيل", true);
+  // تسجيل المواد المتعددة
+  const submitMultipleRegistrations = async () => {
+    if (pendingRegistrations.length === 0) {
+      Alert.alert("تنبيه", "يرجى إضافة مادة واحدة على الأقل");
       return;
     }
 
+    setIsLoading(true);
+    try {
+      const registrations = pendingRegistrations.map((reg) => ({
+        class_id: reg.class_id,
+        class_price: parseFloat(reg.class_price),
+        currency: reg.currency,
+        academicContext: reg.academic_context,
+      }));
+
+      await TeacherMultipleRegistrations({ registrations });
+      setResponseMessage("تم تسجيل المواد بنجاح");
+      setPendingRegistrations([]);
+      loadData();
+    } catch (error: any) {
+      setResponseMessage("فشل في تسجيل المواد");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteRegistration = (registration: RegistrationItem) => {
     Alert.alert(
-      "تأكيد التسجيل",
-      `هل أنت متأكد من تسجيل ${pendingClasses.length} مادة؟`,
+      "تأكيد الحذف",
+      `هل أنت متأكد من حذف تسجيل مادة "${registration.class_name}"؟`,
       [
         { text: "إلغاء", style: "cancel" },
-        { text: "تأكيد", onPress: processRegistrations },
+        {
+          text: "حذف",
+          style: "destructive",
+          onPress: () => deleteRegistration(registration),
+        },
       ]
     );
   };
 
-  const processRegistrations = async () => {
-    setLoading(true);
+  const deleteRegistration = async (registration: RegistrationItem) => {
     try {
-      const registrations = pendingClasses.map((p) => ({
-        class_id: p.class_id,
-        class_name: p.class_name, // إرسال اسم المادة الجديدة
-        class_price: parseFloat(p.class_price),
-      }));
-
-      await TeacherMultipleRegistrations({ registrations });
-      setPendingClasses([]);
-      showMessage(`تم تسجيل ${registrations.length} مادة بنجاح`);
-      fetchRegistrations();
-    } catch (error: any) {
-      showMessage("فشل في التسجيل: " + (error?.message || error), true);
+      await deleteTeacherRegistration(registration.registration_id);
+      setResponseMessage("تم حذف التسجيل بنجاح");
+      loadData();
+    } catch (error) {
+      setResponseMessage("فشل في حذف التسجيل");
     }
-    setLoading(false);
   };
-
-  // تحديث السعر
-  const updatePrice = async () => {
-    const price = parseFloat(priceInput.trim());
-
-    if (!priceInput.trim()) {
-      showMessage("يرجى إدخال السعر", true);
+  // تحديث سعر التسجيل
+  const handleUpdatePrice = async () => {
+    if (!selectedRegistration || !classPrice) {
+      Alert.alert("خطأ", "يرجى إدخال السعر الجديد ");
       return;
     }
 
+    const price = parseFloat(classPrice);
     if (isNaN(price) || price <= 0) {
-      showMessage("يرجى إدخال سعر صحيح أكبر من صفر", true);
+      Alert.alert("خطأ", "يرجى إدخال سعر صحيح");
       return;
     }
 
-    setLoading(true);
     try {
-      await updateTeacherRegistrationPrice(editingRegId!, {
-        class_price: price,
-      });
-      showMessage("تم تحديث السعر بنجاح");
-      fetchRegistrations();
-      resetModal();
-    } catch (error: any) {
-      showMessage("فشل في التحديث: " + (error?.message || error), true);
+      await updateTeacherRegistrationPrice(
+        selectedRegistration.registration_id,
+        {
+          class_price: price,
+        }
+      );
+      setResponseMessage("تم تحديث السعر بنجاح");
+      resetUpdateModal();
+      loadData();
+    } catch (error) {
+      setResponseMessage("فشل في تحديث السعر");
     }
-    setLoading(false);
   };
 
-  // إعادة تعيين المودال
-  const resetModal = () => {
-    setShowModal(false);
-    setClassNameInput("");
-    setPriceInput("");
-    setEditingRegId(null);
+  // إعادة تعيين مودال الإضافة
+  const resetAddModal = () => {
+    setAddModalVisible(false);
+    setSelectedClassId(0);
+    setClassPrice("");
+  };
+
+  // إعادة تعيين مودال التحديث
+  const resetUpdateModal = () => {
+    setUpdateModalVisible(false);
+    setSelectedRegistration(null);
+    setClassPrice("");
   };
 
   // فتح مودال التحديث
-  const openUpdateModal = (regId: number, currentPrice: string) => {
-    setEditingRegId(regId);
-    setPriceInput(currentPrice);
-    setShowModal(true);
+  const openUpdateModal = (registration: RegistrationItem) => {
+    setSelectedRegistration(registration);
+    setClassPrice(registration.class_price.toString());
+    setUpdateModalVisible(true);
   };
 
-  // فتح مودال الإضافة
-  const openAddModal = () => {
-    setEditingRegId(null);
-    setClassNameInput("");
-    setPriceInput("");
-    setShowModal(true);
-  };
+  const educationalSystems = Array.from(
+    new Map(
+      availableClasses.map((cls) => [
+        cls.academic_year.academic_stage.educational_system.id,
+        cls.academic_year.academic_stage.educational_system,
+      ])
+    ).values()
+  );
+
+  const stages = Array.from(
+    new Map(
+      availableClasses
+        .filter(
+          (cls) =>
+            selectedSystemId === 0 ||
+            cls.academic_year.academic_stage.educational_system.id ===
+              selectedSystemId
+        )
+        .map((cls) => [
+          cls.academic_year.academic_stage.id,
+          cls.academic_year.academic_stage,
+        ])
+    ).values()
+  );
+
+  const years = Array.from(
+    new Map(
+      availableClasses
+        .filter(
+          (cls) =>
+            selectedStageId === 0 ||
+            cls.academic_year.academic_stage.id === selectedStageId
+        )
+        .map((cls) => [cls.academic_year.id, cls.academic_year])
+    ).values()
+  );
+
+  const subjects = availableClasses.filter(
+    (cls) => selectedYearId === 0 || cls.academic_year.id === selectedYearId
+  );
 
   return (
     <SafeAreaView style={styles.homeScreen.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+      <LinearGradient
+        colors={["#4F46E5", "#7C3AED"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.homeScreen.headerGradient}
+      >
+        <View style={styles.homeScreen.headerContent}>
+          <View>
+            <AppText style={styles.homeScreen.welcomeText}>
+              {t("teacherClassRegistration")}
+            </AppText>
+          </View>
+          <TouchableOpacity
+            onPress={() => setAddModalVisible(true)}
+            style={styles.homeScreen.iconBorder}
+          >
+            <Ionicons name={"add-circle-outline"} size={30} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
 
-      {/* العنوان */}
-      <View style={styles.homeScreen.contactContainer}>
-        <AppText style={styles.homeScreen.descriptionText}>
-          {t("teacherClassRegistration")}
-        </AppText>
-      </View>
-
-      <View style={styles.homeScreen.contactContainer}>
-        <PrimaryButton
-          title="إضافة مادة جديدة"
-          onPress={openAddModal}
-          theme={theme}
-          textStyle={styles.whiteAndBlackText.whiteText}
-        />
-      </View>
-
-      {message && (
-        <View style={{ margin: 16 }}>
+      {/* رسالة الاستجابة */}
+      {responseMessage && (
+        <View style={{ marginHorizontal: 16, marginVertical: 10 }}>
           <AppText
             style={{
               textAlign: "center",
-              padding: 15,
-              backgroundColor:
-                message.includes("فشل") || message.includes("خطأ")
-                  ? "#f8d7da"
-                  : "#d1ecf1",
+              padding: 10,
+              backgroundColor: "#f0f8ff",
               borderRadius: 8,
-              color:
-                message.includes("فشل") || message.includes("خطأ")
-                  ? "#721c24"
-                  : "#0c5460",
-              fontSize: 14,
+              borderWidth: 1,
+              borderColor: "#7C3AED",
             }}
           >
-            {message}
+            {responseMessage}
           </AppText>
         </View>
       )}
 
-      <ScrollView
-        style={{ flex: 1, paddingHorizontal: 16 }}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={{ flex: 1, paddingHorizontal: 16 }}>
+        {/* المواد المؤقتة */}
         <View style={{ marginTop: 20 }}>
-          <AppText
-            style={{
-              fontSize: 18,
-              fontWeight: getFontWeight(theme.fontWeight.bold),
-              marginBottom: 10,
-            }}
-          >
-            المواد المضافة ({pendingClasses.length})
+          <AppText style={{ fontSize: 18, marginBottom: 10 }}>
+            {t("addedClassed")} ({pendingRegistrations.length})
           </AppText>
 
-          {pendingClasses.length === 0 ? (
-            <View style={styles.teacherRegisterationStyles.emptyContainer}>
+          {pendingRegistrations.length === 0 ? (
+            <View
+              style={{
+                paddingVertical: 20,
+                backgroundColor: "#f9f9f9",
+                borderRadius: 8,
+              }}
+            >
               <AppText style={{ textAlign: "center", color: "#888" }}>
-                لم يتم إضافة أي مواد بعد
+                {t("noClassAdded")}
               </AppText>
             </View>
           ) : (
-            <>
-              {pendingClasses.map((item) => (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <View>
                 <View
-                  key={item.id}
-                  style={styles.teacherRegisterationStyles.pendingItemStyle}
-                >
-                  <View style={{ flex: 1 }}>
-                    <AppText
-                      style={{
-                        fontWeight: getFontWeight(theme.fontWeight.bold),
-                        fontSize: 16,
-                      }}
-                    >
-                      {item.class_name}
-                    </AppText>
-                    <AppText
-                      style={{
-                        fontSize: 14,
-                        color: "#7C3AED",
-                        fontWeight: getFontWeight(theme.fontWeight.bold),
-                        marginTop: 4,
-                      }}
-                    >
-                      {item.class_price}
-                    </AppText>
-                  </View>
-                  <TouchableOpacity
-                    style={styles.teacherRegisterationStyles.deleteButton}
-                    onPress={() => removePending(item.id)}
-                  >
-                    <AppText
-                      style={{
-                        color: "white",
-                        fontSize: 12,
-                        fontWeight: getFontWeight(theme.fontWeight.bold),
-                      }}
-                    >
-                      حذف
-                    </AppText>
-                  </TouchableOpacity>
-                </View>
-              ))}
-              <TouchableOpacity
-                style={[
-                  styles.teacherRegisterationStyles.submitButton,
-                  { opacity: loading ? 0.6 : 1 },
-                ]}
-                onPress={submitRegistrations}
-                disabled={loading}
-              >
-                <AppText
                   style={{
-                    color: "white",
-                    textAlign: "center",
-                    fontWeight: getFontWeight(theme.fontWeight.bold),
-                    fontSize: 16,
+                    flexDirection: "row",
+                    paddingVertical: 12,
+                    backgroundColor: "#f5f5f5",
+                    borderRadius: 8,
+                    minWidth: 900,
+                    borderWidth: 1,
+                    borderColor: "#aaa",
                   }}
                 >
-                  {loading
-                    ? "جاري التسجيل..."
-                    : `تسجيل ${pendingClasses.length} مادة`}
-                </AppText>
-              </TouchableOpacity>
-            </>
+                  <AppText
+                    style={{ fontSize: 12, width: 150, textAlign: "center" }}
+                  >
+                    {t("classItem")}
+                  </AppText>
+                  <AppText
+                    style={{ fontSize: 12, width: 80, textAlign: "center" }}
+                  >
+                    {t("price")}
+                  </AppText>
+                  <AppText
+                    style={{ fontSize: 12, width: 80, textAlign: "center" }}
+                  >
+                    {t("currency")}
+                  </AppText>
+                  <AppText
+                    style={{ fontSize: 12, width: 120, textAlign: "center" }}
+                  >
+                    {t("class")}
+                  </AppText>
+                  <AppText
+                    style={{ fontSize: 12, width: 120, textAlign: "center" }}
+                  >
+                    {t("stage")}
+                  </AppText>
+                  <AppText
+                    style={{ fontSize: 12, width: 150, textAlign: "center" }}
+                  >
+                    {t("system")}
+                  </AppText>
+                  <AppText
+                    style={{ fontSize: 12, width: 150, textAlign: "center" }}
+                  >
+                    {t("action")}
+                  </AppText>
+                </View>
+
+                {pendingRegistrations.map((registration) => (
+                  <View
+                    key={registration.id}
+                    style={{
+                      flexDirection: "row",
+                      paddingVertical: 12,
+                      borderBottomWidth: 1,
+                      borderColor: "#aaa",
+                      alignItems: "center",
+                      minWidth: 900,
+                      backgroundColor: "#f0f8ff",
+                      // minWidth: 500, // عرض الجدول
+                    }}
+                  >
+                    <AppText
+                      style={{ fontSize: 12, width: 150, textAlign: "center" }}
+                    >
+                      {registration.class_name}
+                    </AppText>
+                    <AppText
+                      style={{ fontSize: 12, width: 80, textAlign: "center" }}
+                    >
+                      {registration.class_price}
+                    </AppText>
+                    <AppText
+                      style={{ fontSize: 12, width: 80, textAlign: "center" }}
+                    >
+                      {registration.currency}
+                    </AppText>
+                    <AppText
+                      style={{ fontSize: 12, width: 120, textAlign: "center" }}
+                    >
+                      {registration.academic_context?.name}
+                    </AppText>
+                    <AppText
+                      style={{ fontSize: 12, width: 120, textAlign: "center" }}
+                    >
+                      {registration.academic_context?.academic_stage.name}
+                    </AppText>
+                    <AppText
+                      style={{ fontSize: 12, width: 150, textAlign: "center" }}
+                    >
+                      {
+                        registration.academic_context?.academic_stage
+                          .educational_system.name
+                      }
+                    </AppText>
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: "#ff4444",
+                        paddingVertical: 6,
+                        paddingHorizontal: 12,
+                        borderRadius: 4,
+                      }}
+                      onPress={() => removePendingRegistration(registration.id)}
+                    >
+                      <AppText style={{ color: "white", fontSize: 12 }}>
+                        {t("remove")}
+                      </AppText>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+            </ScrollView>
           )}
         </View>
 
-        {/* المواد المسجلة */}
-        <View
+        <TouchableOpacity
           style={{
-            marginTop: 30,
-            marginBottom: 30,
+            backgroundColor: "#7C3AED",
+            paddingVertical: 15,
+            borderRadius: 8,
+            marginTop: 10,
+            opacity: isLoading ? 0.6 : 1,
           }}
+          onPress={submitMultipleRegistrations}
+          disabled={isLoading}
         >
           <AppText
-            style={{
-              fontSize: 18,
-              fontWeight: getFontWeight(theme.fontWeight.bold),
-              marginBottom: 10,
-            }}
+            style={{ color: "white", textAlign: "center", fontSize: 16 }}
           >
-            المواد المسجلة ({registrations.length})
+            {isLoading
+              ? t("registering")
+              : `${t("register")} ${pendingRegistrations.length} ${t(
+                  "classes"
+                )}`}
+          </AppText>
+        </TouchableOpacity>
+
+        {/* المواد المسجلة */}
+        <View style={{ marginTop: 20 }}>
+          <AppText style={{ fontSize: 18, marginBottom: 10 }}>
+            {t("registeredClassed")} ({teacherRegistrations.length})
           </AppText>
 
-          {loading && registrations.length === 0 ? (
-            <View style={styles.teacherRegisterationStyles.emptyContainer}>
-              <AppText style={{ textAlign: "center", color: "#888" }}>
-                جاري تحميل التسجيلات...
-              </AppText>
-            </View>
-          ) : registrations.length === 0 ? (
-            <View style={styles.teacherRegisterationStyles.emptyContainer}>
-              <AppText style={{ textAlign: "center", color: "#888" }}>
-                لا يوجد تسجيلات
-              </AppText>
-            </View>
-          ) : (
-            registrations.map((reg, index) => (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View>
+              {/* رأس الجدول */}
               <View
-                key={reg.registration_id || index}
-                style={styles.teacherRegisterationStyles.registrationItemStyle}
+                style={{
+                  flexDirection: "row",
+                  paddingVertical: 12,
+                  backgroundColor: "#f5f5f5",
+                  borderRadius: 8,
+                  minWidth: 900,
+                  borderWidth: 1,
+                  borderColor: "#aaa",
+                }}
               >
-                <View style={{ flex: 1 }}>
-                  <AppText
-                    style={{
-                      fontWeight: getFontWeight(theme.fontWeight.bold),
-                      fontSize: 16,
-                    }}
-                  >
-                    {reg.class_name}
-                  </AppText>
-                  <AppText
-                    style={{
-                      fontSize: 12,
-                      color:
-                        reg.registration_status === "active"
-                          ? "#28a745"
-                          : reg.registration_status === "pending"
-                          ? "#ffc107"
-                          : "#dc3545",
-                      marginTop: 2,
-                      fontWeight: getFontWeight(theme.fontWeight.bold),
-                    }}
-                  >
-                    {reg.registration_status === "active"
-                      ? "نشط"
-                      : reg.registration_status === "pending"
-                      ? "في الانتظار"
-                      : reg.registration_status}
+                <AppText
+                  style={{ fontSize: 12, width: 150, textAlign: "center" }}
+                >
+                  {t("classItem")}
+                </AppText>
+                <AppText
+                  style={{ fontSize: 12, width: 80, textAlign: "center" }}
+                >
+                  {t("price")}
+                </AppText>
+                <AppText
+                  style={{ fontSize: 12, width: 80, textAlign: "center" }}
+                >
+                  {t("currency")}
+                </AppText>
+                <AppText
+                  style={{ fontSize: 12, width: 120, textAlign: "center" }}
+                >
+                  {t("class")}
+                </AppText>
+                <AppText
+                  style={{ fontSize: 12, width: 120, textAlign: "center" }}
+                >
+                  {t("stage")}
+                </AppText>
+                <AppText
+                  style={{ fontSize: 12, width: 150, textAlign: "center" }}
+                >
+                  {t("system")}
+                </AppText>
+                <AppText
+                  style={{ fontSize: 12, width: 100, textAlign: "center" }}
+                >
+                  {t("status")}
+                </AppText>
+                <AppText
+                  style={{ fontSize: 12, width: 120, textAlign: "center" }}
+                >
+                  {t("action")}
+                </AppText>
+              </View>
+
+              {/* الصفوف */}
+              {teacherRegistrations.length === 0 ? (
+                <View style={{ paddingVertical: 20 }}>
+                  <AppText style={{ textAlign: "center", color: "#888" }}>
+                    {t("noRegisterations")}
                   </AppText>
                 </View>
-                <AppText
-                  style={{
-                    fontSize: 16,
-                    fontWeight: getFontWeight(theme.fontWeight.bold),
-                    color: "#7C3AED",
-                    marginHorizontal: 10,
-                  }}
-                >
-                  {reg.class_price}
-                </AppText>
-                <TouchableOpacity
-                  style={[
-                    styles.teacherRegisterationStyles.updateButton,
-                    { opacity: loading ? 0.6 : 1 },
-                  ]}
-                  onPress={() =>
-                    openUpdateModal(
-                      reg.registration_id,
-                      reg.class_price?.toString() || "0"
-                    )
-                  }
-                  disabled={loading}
-                >
-                  <AppText
+              ) : (
+                teacherRegistrations.map((registration) => (
+                  <View
+                    key={registration.registration_id}
                     style={{
-                      color: "white",
-                      fontSize: 10,
-                      fontWeight: getFontWeight(theme.fontWeight.bold),
+                      flexDirection: "row",
+                      paddingVertical: 12,
+                      borderBottomWidth: 1,
+                      borderColor: "#aaa",
+                      alignItems: "center",
+                      minWidth: 900,
                     }}
                   >
-                    تحديث السعر
-                  </AppText>
-                </TouchableOpacity>
-              </View>
-            ))
-          )}
+                    <AppText
+                      style={{ width: 150, textAlign: "center", fontSize: 12 }}
+                    >
+                      {registration.class_name}
+                    </AppText>
+                    <AppText style={{ width: 80, textAlign: "center" }}>
+                      {registration.class_price}
+                    </AppText>
+                    <AppText style={{ width: 80, textAlign: "center" }}>
+                      {registration.currency}
+                    </AppText>
+                    <AppText style={{ width: 120, textAlign: "center" }}>
+                      {registration.academic_context.name}
+                    </AppText>
+                    <AppText style={{ width: 120, textAlign: "center" }}>
+                      {registration.academic_context.academic_stage.name}
+                    </AppText>
+                    <AppText style={{ width: 150, textAlign: "center" }}>
+                      {
+                        registration.academic_context.academic_stage
+                          .educational_system.name
+                      }
+                    </AppText>
+                    <AppText
+                      style={{
+                        width: 100,
+                        textAlign: "center",
+                        fontSize: 10,
+                        color:
+                          registration.registration_status === "active"
+                            ? "green"
+                            : "orange",
+                      }}
+                    >
+                      {registration.registration_status}
+                    </AppText>
+                    <TouchableOpacity
+                      style={{
+                        width: 120,
+                        backgroundColor: "#28a745",
+                        paddingVertical: 6,
+                        paddingHorizontal: 8,
+                        borderRadius: 4,
+                        marginHorizontal: 4,
+                      }}
+                      onPress={() => openUpdateModal(registration)}
+                    >
+                      <AppText
+                        style={{
+                          color: "white",
+                          textAlign: "center",
+                          fontSize: 10,
+                        }}
+                      >
+                        {t("updatePrice")}
+                      </AppText>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: "#dc3545",
+                        paddingVertical: 6,
+                        paddingHorizontal: 8,
+                        borderRadius: 4,
+                      }}
+                      onPress={() => handleDeleteRegistration(registration)}
+                    >
+                      <AppText
+                        style={{
+                          color: "white",
+                          textAlign: "center",
+                          fontSize: 10,
+                        }}
+                      >
+                        حذف
+                      </AppText>
+                    </TouchableOpacity>
+                  </View>
+                ))
+              )}
+            </View>
+          </ScrollView>
         </View>
       </ScrollView>
 
-      {/* المودال الموحد */}
-      <ClassModal
-        visible={showModal}
-        editingRegId={editingRegId}
-        classNameInput={classNameInput}
-        priceInput={priceInput}
-        loading={loading}
-        onClassNameChange={setClassNameInput}
-        onPriceChange={setPriceInput}
-        onCancel={resetModal}
-        onSubmit={editingRegId ? updatePrice : addPendingClass}
-      />
+      <Modal
+        animationType="fade"
+        transparent
+        visible={addModalVisible}
+        onRequestClose={resetAddModal}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            justifyContent: "center",
+            alignItems: "center",
+            paddingHorizontal: 10,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "white",
+              borderRadius: 15,
+              width: width * 0.9,
+              maxHeight: "85%",
+              paddingVertical: 10,
+            }}
+          >
+            <ScrollView
+              contentContainerStyle={{ padding: 20 }}
+              showsVerticalScrollIndicator={false}
+            >
+              <AppText
+                style={{
+                  fontSize: 20,
+                  textAlign: "center",
+                  marginBottom: 20,
+                }}
+              >
+                {t("addNew")}
+              </AppText>
+
+              {/* اختر النظام */}
+              <View style={{ marginBottom: 15 }}>
+                <AppText style={{ marginBottom: 6 }}>اختر النظام</AppText>
+                <View
+                  style={{
+                    borderWidth: 1,
+                    borderColor: "#ccc",
+                    borderRadius: 8,
+                    overflow: "hidden",
+                  }}
+                >
+                  <Picker
+                    selectedValue={selectedSystemId}
+                    onValueChange={(v) => {
+                      setSelectedSystemId(v);
+                      setSelectedStageId(0);
+                      setSelectedYearId(0);
+                      setSelectedClassId(0);
+                    }}
+                  >
+                    <Picker.Item label="اختر النظام" value={0} />
+                    {educationalSystems.map((sys) => (
+                      <Picker.Item
+                        key={sys.id}
+                        label={sys.name}
+                        value={sys.id}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+              </View>
+
+              {/* اختر المرحلة */}
+              <View style={{ marginBottom: 15 }}>
+                <AppText style={{ marginBottom: 6 }}>اختر المرحلة</AppText>
+                <View
+                  style={{
+                    borderWidth: 1,
+                    borderColor: "#ccc",
+                    borderRadius: 8,
+                    overflow: "hidden",
+                  }}
+                >
+                  <Picker
+                    selectedValue={selectedStageId}
+                    onValueChange={(v) => {
+                      setSelectedStageId(v);
+                      setSelectedYearId(0);
+                      setSelectedClassId(0);
+                    }}
+                  >
+                    <Picker.Item label="اختر المرحلة" value={0} />
+                    {stages.map((stage) => (
+                      <Picker.Item
+                        key={stage.id}
+                        label={stage.name}
+                        value={stage.id}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+              </View>
+
+              {/* اختر الصف */}
+              <View style={{ marginBottom: 15 }}>
+                <AppText style={{ marginBottom: 6 }}>اختر الصف</AppText>
+                <View
+                  style={{
+                    borderWidth: 1,
+                    borderColor: "#ccc",
+                    borderRadius: 8,
+                    overflow: "hidden",
+                  }}
+                >
+                  <Picker
+                    selectedValue={selectedYearId}
+                    onValueChange={(v) => {
+                      setSelectedYearId(v);
+                      setSelectedClassId(0);
+                    }}
+                  >
+                    <Picker.Item label="اختر الصف" value={0} />
+                    {years.map((year) => (
+                      <Picker.Item
+                        key={year.id}
+                        label={year.name}
+                        value={year.id}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+              </View>
+
+              {/* اختر المادة */}
+              <View style={{ marginBottom: 15 }}>
+                <AppText style={{ marginBottom: 6 }}>اختر المادة</AppText>
+                <View
+                  style={{
+                    borderWidth: 1,
+                    borderColor: "#ccc",
+                    borderRadius: 8,
+                    overflow: "hidden",
+                  }}
+                >
+                  <Picker
+                    selectedValue={selectedClassId}
+                    onValueChange={(v) => setSelectedClassId(v)}
+                  >
+                    <Picker.Item label="اختر المادة" value={0} />
+                    {subjects.map((subj) => (
+                      <Picker.Item
+                        key={subj.id}
+                        label={subj.name}
+                        value={subj.id}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+              </View>
+
+              {/* السعر */}
+              <View style={{ marginBottom: 15 }}>
+                <AppText style={{ marginBottom: 6 }}>{t("price")}:</AppText>
+                <TextInput
+                  style={{
+                    borderWidth: 1,
+                    borderColor: "#ccc",
+                    borderRadius: 8,
+                    padding: 12,
+                    fontSize: 16,
+                    backgroundColor: "#fff",
+                  }}
+                  placeholder={t("enterPrice")}
+                  value={classPrice}
+                  onChangeText={setClassPrice}
+                  keyboardType="numeric"
+                />
+              </View>
+
+              {/* العملة */}
+              <View style={{ marginBottom: 20 }}>
+                <AppText style={{ marginBottom: 6 }}>{t("currency")}:</AppText>
+                <TextInput
+                  style={{
+                    borderWidth: 1,
+                    borderColor: "#ccc",
+                    borderRadius: 8,
+                    padding: 12,
+                    fontSize: 16,
+                    backgroundColor: "#fff",
+                  }}
+                  placeholder={t("enterCurrency")}
+                  value={classPriceCurrency}
+                  onChangeText={setClassPriceCurrency}
+                  keyboardType="numeric"
+                />
+              </View>
+
+              {/* الأزرار */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    backgroundColor: "#ccc",
+                    paddingVertical: 12,
+                    borderRadius: 8,
+                    marginRight: 10,
+                  }}
+                  onPress={resetAddModal}
+                >
+                  <AppText style={{ textAlign: "center" }}>
+                    {t("cancel")}
+                  </AppText>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    backgroundColor: "#7C3AED",
+                    paddingVertical: 12,
+                    borderRadius: 8,
+                    marginLeft: 10,
+                  }}
+                  onPress={addToPendingRegistrations}
+                >
+                  <AppText style={{ textAlign: "center", color: "white" }}>
+                    {t("addNew")}
+                  </AppText>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* مودال تحديث السعر */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={updateModalVisible}
+        onRequestClose={resetUpdateModal}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "white",
+              borderRadius: 15,
+              padding: 20,
+              width: width * 0.9,
+            }}
+          >
+            <AppText
+              style={{ fontSize: 20, textAlign: "center", marginBottom: 20 }}
+            >
+              {t("updatePrice")}
+            </AppText>
+
+            {selectedRegistration && (
+              <AppText
+                style={{ textAlign: "center", marginBottom: 15, fontSize: 16 }}
+              >
+                {selectedRegistration.class_name}
+              </AppText>
+            )}
+
+            <View style={{ marginBottom: 20 }}>
+              <AppText style={{ marginBottom: 8 }}>{t("newPrice")}:</AppText>
+              <TextInput
+                style={{
+                  borderWidth: 1,
+                  borderColor: "#ccc",
+                  borderRadius: 8,
+                  padding: 12,
+                  fontSize: 16,
+                  backgroundColor: "#fff",
+                }}
+                placeholder={t("newPrice")}
+                value={classPrice}
+                onChangeText={setClassPrice}
+                keyboardType="numeric"
+              />
+            </View>
+
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
+            >
+              <TouchableOpacity
+                style={{
+                  flex: 1,
+                  backgroundColor: "#ccc",
+                  paddingVertical: 12,
+                  borderRadius: 8,
+                  marginRight: 10,
+                }}
+                onPress={resetUpdateModal}
+              >
+                <AppText style={{ textAlign: "center" }}>{t("cancel")}</AppText>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={{
+                  flex: 1,
+                  backgroundColor: "#28a745",
+                  paddingVertical: 12,
+                  borderRadius: 8,
+                  marginLeft: 10,
+                }}
+                onPress={handleUpdatePrice}
+              >
+                <AppText style={{ textAlign: "center", color: "white" }}>
+                  {t("updatePrice")}
+                </AppText>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }

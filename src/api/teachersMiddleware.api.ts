@@ -61,6 +61,105 @@ export const getTeacherRegistrations =
     return response.data as TeacherRegistrationsResponse;
   };
 
+// export const getTeacherClasses = async (): Promise<TeacherClassesResponse> => {
+//   // داتا وهمية للفصول
+//   const mockData: TeacherClassesResponse = {
+//     data: [
+//       {
+//         id: 1,
+//         name: "رياضيات - الصف الأول الثانوي",
+//         academic_year: {
+//           id: 1,
+//           name: "2024/2025",
+//           academic_stage: {
+//             id: 1,
+//             name: "الصف الأول الثانوي",
+//             educational_system: {
+//               id: 1,
+//               name: "نظام ثانوي عام",
+//               description: "تعليم ثانوي عام",
+//             },
+//           },
+//         },
+//       },
+//       {
+//         id: 2,
+//         name: "لغة عربية - الصف الثاني الثانوي",
+//         academic_year: {
+//           id: 2,
+//           name: "2024/2025",
+//           academic_stage: {
+//             id: 2,
+//             name: "الصف الثاني الثانوي",
+//             educational_system: {
+//               id: 1,
+//               name: "نظام ثانوي عام",
+//               description: "تعليم ثانوي عام",
+//             },
+//           },
+//         },
+//       },
+//     ],
+//   };
+
+//   console.log("Mock getTeacherClasses:", mockData);
+//   return mockData;
+// };
+
+// export const getTeacherRegistrations =
+//   async (): Promise<TeacherRegistrationsResponse> => {
+//     // داتا وهمية للتسجيلات الحالية
+//     const mockData: TeacherRegistrationsResponse = {
+//       data: [
+//         {
+//           class_id: 1,
+//           class_name: "رياضيات - الصف الأول الثانوي",
+//           registration_status: "active",
+//           class_price: 150,
+//           registration_id: 101,
+//           currency: "SAR",
+//           academic_context: {
+//             id: 1,
+//             name: "2024/2025",
+//             academic_stage: {
+//               id: 1,
+//               name: "الصف الأول الثانوي",
+//               educational_system: {
+//                 id: 1,
+//                 name: "نظام ثانوي عام",
+//                 description: "تعليم ثانوي عام",
+//               },
+//             },
+//           },
+//         },
+//         {
+//           class_id: 2,
+//           class_name: "لغة عربية - الصف الثاني الثانوي",
+//           registration_status: "pending",
+//           class_price: 120,
+//           registration_id: 102,
+//           currency: "SAR",
+//           academic_context: {
+//             id: 2,
+//             name: "2024/2025",
+//             academic_stage: {
+//               id: 2,
+//               name: "الصف الثاني الثانوي",
+//               educational_system: {
+//                 id: 1,
+//                 name: "نظام ثانوي عام",
+//                 description: "تعليم ثانوي عام",
+//               },
+//             },
+//           },
+//         },
+//       ],
+//     };
+
+//     console.log("Mock getTeacherRegistrations:", mockData);
+//     return mockData;
+//   };
+
 export const updateTeacherRegistrationPrice = async (
   registrationId: number,
   request: RegistrationRequest
@@ -97,14 +196,10 @@ export const TeacherSingleRegistration = async (
 };
 
 export const deleteTeacherRegistration = async (
-  registrationId: number,
-  request: RegistrationRequest
+  registrationId: number
 ): Promise<{ message: string }> => {
   const response = await api.delete(
-    `/api/teacher/registrations/${registrationId}`,
-    {
-      data: request, // axios يسمح بإرسال body في delete من خلال config.data
-    }
+    `/api/teacher/registrations/${registrationId}`
   );
 
   return response.data as { message: string };

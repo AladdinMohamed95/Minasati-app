@@ -81,7 +81,7 @@ const commonTheme = {
 
 export const lightTheme: Theme = {
   background: {
-    primary: "#F9FAFB",
+    primary: "#f0f8ff",
     secondary: "#F5E9DA",
     card: "#FFFFFF",
     surface: "#EDEFF1",

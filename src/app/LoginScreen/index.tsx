@@ -1,4 +1,3 @@
-import { PrimaryButton } from "@/components/AppButton";
 import AppText from "@/components/AppText";
 import { LoadingView } from "@/components/LoadingView";
 import { useTheme } from "@/context/ThemeContext";
@@ -7,21 +6,18 @@ import { useUser } from "@/context/UserContext";
 import { createStyles } from "@/styles";
 import { LoginResponse, UserType } from "@/types/api";
 import { formDataProps } from "@/types/types";
+import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
   SafeAreaView,
   ScrollView,
   StatusBar,
-  Switch,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from "react-native";
 
@@ -128,111 +124,133 @@ const LoginScreen = () => {
     <SafeAreaView style={styles.homeScreen.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1, paddingHorizontal: 20 }}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      <LinearGradient
+        colors={["#4F46E5", "#7C3AED"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.homeScreen.headerGradient}
       >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <ScrollView
-            contentContainerStyle={{ flexGrow: 1 }}
-            keyboardShouldPersistTaps="handled"
+        <View style={styles.homeScreen.headerContent}>
+          <View>
+            <AppText style={styles.homeScreen.welcomeText}>
+              {isLoginLoading ? t("loading") : t("login")}
+            </AppText>
+          </View>
+          <TouchableOpacity
+            onPress={handleLogin}
+            disabled={isLoginLoading}
+            style={styles.homeScreen.iconBorder}
           >
-            <View style={styles.homeScreen.descriptionContainer} />
+            <Ionicons name={"log-in-outline"} size={30} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
 
-            <View style={styles.homeScreen.signupContainer}>
-              <AppText style={styles.registerScreen.label}>
-                {isStudent ? t("student") : t("teacher")}
-              </AppText>
-              <Switch
-                value={isStudent}
-                onValueChange={setIsStudent}
-                thumbColor={isStudent ? "#fff" : "#f4f3f4"}
-                trackColor={{ false: "#767577", true: "#81b0ff" }}
-                disabled={isLoginLoading}
-              />
-            </View>
-
-            <View style={styles.registerScreen.inputContainer}>
-              <AppText style={styles.registerScreen.label}>
-                {t("phone")}
-              </AppText>
-              <TextInput
-                style={[
-                  styles.registerScreen.input,
-                  errors.phone && styles.registerScreen.inputError,
-                ]}
-                value={formData.phone}
-                onChangeText={(text) => handleInputChange("phone", text)}
-                keyboardType="phone-pad"
-                textAlign={language === "ar" ? "right" : "left"}
-                editable={!isLoginLoading}
-              />
-              {errors.phone && (
-                <AppText style={styles.registerScreen.errorText}>
-                  {errors.phone}
-                </AppText>
-              )}
-            </View>
-
-            <View style={styles.registerScreen.inputContainer}>
-              <AppText style={styles.registerScreen.label}>
-                {t("password")}
-              </AppText>
-              <TextInput
-                style={[
-                  styles.registerScreen.input,
-                  errors.password && styles.registerScreen.inputError,
-                ]}
-                value={formData.password}
-                onChangeText={(text) => handleInputChange("password", text)}
-                secureTextEntry={true}
-                textAlign={language === "ar" ? "right" : "left"}
-                editable={!isLoginLoading}
-              />
-              {errors.password && (
-                <AppText style={styles.registerScreen.errorText}>
-                  {errors.password}
-                </AppText>
-              )}
-            </View>
-
-            <PrimaryButton
-              title={isLoginLoading ? t("loading") : t("login")}
-              onPress={handleLogin}
-              theme={theme}
-              textStyle={styles.whiteAndBlackText.whiteText}
-              disabled={isLoginLoading}
-            />
-
-            {response && (
-              <AppText style={styles.registerScreen.errorText}>
-                {response}
-              </AppText>
-            )}
-
+      <ScrollView>
+        <View style={styles.homeScreen.signupContainer}>
+          <View style={styles.registerScreen.toggleContainer}>
             <TouchableOpacity
-              onPress={handlePhoneRegister}
+              style={[
+                styles.registerScreen.toggleButton,
+                isStudent && styles.registerScreen.toggleButtonActive,
+              ]}
+              onPress={() => setIsStudent(true)}
               disabled={isLoginLoading}
             >
               <AppText
                 style={[
-                  styles.otherViewStyle.teacherLink,
-                  isLoginLoading && { opacity: 0.5 },
+                  styles.registerScreen.toggleText,
+                  isStudent && styles.registerScreen.toggleTextActive,
                 ]}
               >
-                {t("newUser")}
+                {t("student")}
               </AppText>
             </TouchableOpacity>
-          </ScrollView>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
 
-      {isLoginLoading && (
-        <View style={styles.homeScreen.loadingView}>
-          <LoadingView isLoading={true} />
+            <TouchableOpacity
+              style={[
+                styles.registerScreen.toggleButton,
+                !isStudent && styles.registerScreen.toggleButtonActive,
+              ]}
+              onPress={() => setIsStudent(false)}
+              disabled={isLoginLoading}
+            >
+              <AppText
+                style={[
+                  styles.registerScreen.toggleText,
+                  !isStudent && styles.registerScreen.toggleTextActive,
+                ]}
+              >
+                {t("teacher")}
+              </AppText>
+            </TouchableOpacity>
+          </View>
         </View>
-      )}
+
+        <View style={styles.registerScreen.inputContainer}>
+          <AppText style={styles.registerScreen.label}>{t("phone")}</AppText>
+          <TextInput
+            style={[
+              styles.registerScreen.input,
+              errors.phone && styles.registerScreen.inputError,
+            ]}
+            value={formData.phone}
+            onChangeText={(text) => handleInputChange("phone", text)}
+            keyboardType="phone-pad"
+            textAlign={language === "ar" ? "right" : "left"}
+            editable={!isLoginLoading}
+          />
+          {errors.phone && (
+            <AppText style={styles.registerScreen.errorText}>
+              {errors.phone}
+            </AppText>
+          )}
+        </View>
+
+        <View style={styles.registerScreen.inputContainer}>
+          <AppText style={styles.registerScreen.label}>{t("password")}</AppText>
+          <TextInput
+            style={[
+              styles.registerScreen.input,
+              errors.password && styles.registerScreen.inputError,
+            ]}
+            value={formData.password}
+            onChangeText={(text) => handleInputChange("password", text)}
+            secureTextEntry={true}
+            textAlign={language === "ar" ? "right" : "left"}
+            editable={!isLoginLoading}
+          />
+          {errors.password && (
+            <AppText style={styles.registerScreen.errorText}>
+              {errors.password}
+            </AppText>
+          )}
+        </View>
+
+        {response && (
+          <AppText style={styles.registerScreen.errorText}>{response}</AppText>
+        )}
+
+        <TouchableOpacity
+          onPress={handlePhoneRegister}
+          disabled={isLoginLoading}
+        >
+          <AppText
+            style={[
+              styles.otherViewStyle.teacherLink,
+              isLoginLoading && { opacity: 0.5 },
+            ]}
+          >
+            {t("newUser")}
+          </AppText>
+        </TouchableOpacity>
+
+        {isLoginLoading && (
+          <View style={styles.homeScreen.loadingView}>
+            <LoadingView isLoading={true} />
+          </View>
+        )}
+      </ScrollView>
     </SafeAreaView>
   );
 };

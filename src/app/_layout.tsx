@@ -11,10 +11,10 @@ import { ConfigureRTL } from "@/utils";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { Platform, StatusBar as RNStatusBar, View } from "react-native";
+import { Platform, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
-const ANDROID_STATUSBAR_HEIGHT = RNStatusBar.currentHeight ?? 24;
+// const ANDROID_STATUSBAR_HEIGHT = RNStatusBar.currentHeight - 30 ?? 24;
 // This component handles the status bar based on theme
 const ThemedStatusBar: React.FC = () => {
   const { theme } = useTheme();
@@ -25,7 +25,7 @@ const ThemedStatusBar: React.FC = () => {
       {Platform.OS === "android" && (
         <View
           style={{
-            height: ANDROID_STATUSBAR_HEIGHT,
+            // height: ANDROID_STATUSBAR_HEIGHT,
             backgroundColor: theme.background.primary,
             width: "100%",
           }}

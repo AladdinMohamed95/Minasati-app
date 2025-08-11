@@ -1,5 +1,4 @@
 import { studentRegister, teacherRegister } from "@/api/auth";
-import { PrimaryButton } from "@/components/AppButton";
 import AppText from "@/components/AppText";
 import { LoadingView } from "@/components/LoadingView";
 import { useTheme } from "@/context/ThemeContext";
@@ -8,6 +7,8 @@ import { useUser } from "@/context/UserContext";
 import { createStyles } from "@/styles";
 import { RegisterRequest, UserType } from "@/types/api"; // إضافة UserType
 import { formDataProps } from "@/types/types";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -15,8 +16,8 @@ import {
   Alert,
   SafeAreaView,
   ScrollView,
-  Switch,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 
@@ -29,9 +30,10 @@ const StudentFormScreen = () => {
   const params = useLocalSearchParams();
   const isEdit = params.mode === "edit";
   const { updateUser } = useUser();
-  const [isEnabled, setIsEnabled] = useState(true); // true = طالب, false = معلم
+  const [isStudent, setIsStudent] = useState(true); // true = طالب, false = معلم
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const { login } = useUser();
 
   const [formData, setFormData] = useState<
     Pick<formDataProps, "name" | "phone" | "password" | "password_confirmation">
@@ -135,7 +137,7 @@ const StudentFormScreen = () => {
           { text: t("ok"), onPress: () => router.back() },
         ]);
       } else {
-        if (isEnabled) {
+        if (isStudent) {
           await studentRegister(
             {
               name: formData.name,
@@ -145,6 +147,8 @@ const StudentFormScreen = () => {
             },
             UserType.student
           );
+          await login(formData.phone, formData.password, UserType.student);
+
           Alert.alert(
             t("registrationSuccess"),
             t("studentRegisteredSuccessfully"),
@@ -160,6 +164,8 @@ const StudentFormScreen = () => {
             },
             UserType.teacher
           );
+          await login(formData.phone, formData.password, UserType.student);
+
           Alert.alert(
             t("registrationSuccess"),
             t("teacherRegisteredSuccessfully"),
@@ -175,7 +181,7 @@ const StudentFormScreen = () => {
     } catch (error) {
       console.error(
         `Error ${isEdit ? "updating" : "registering"} ${
-          isEnabled ? "student" : "teacher"
+          isStudent ? "student" : "teacher"
         }:`,
         error
       );
@@ -210,133 +216,152 @@ const StudentFormScreen = () => {
 
   return (
     <SafeAreaView style={styles.homeScreen.container}>
-      <ScrollView style={styles.registerScreen.scrollContainer}>
-        <View style={styles.registerScreen.formContainer}>
-          {isEdit ? (
-            <AppText style={styles.registerScreen.title}>
-              {t("editUserTitle")}
+      <LinearGradient
+        colors={["#4F46E5", "#7C3AED"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.homeScreen.headerGradient}
+      >
+        <View style={styles.homeScreen.headerContent}>
+          <View>
+            <AppText style={styles.homeScreen.welcomeText}>
+              {isEdit ? t("editUserTitle") : t("userRegisterationTitle")}
             </AppText>
-          ) : (
-            <AppText style={styles.registerScreen.title}>
-              {t("userRegisterationTitle")}
+          </View>
+          <TouchableOpacity
+            onPress={handleSubmit}
+            disabled={isInitialized}
+            style={styles.homeScreen.iconBorder}
+          >
+            <Ionicons name={"person-add-outline"} size={30} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
+
+      <ScrollView style={styles.registerScreen.scrollContainer}>
+        <View style={styles.homeScreen.signupContainer}>
+          <View style={styles.registerScreen.toggleContainer}>
+            <TouchableOpacity
+              style={[
+                styles.registerScreen.toggleButton,
+                isStudent && styles.registerScreen.toggleButtonActive,
+              ]}
+              onPress={() => setIsStudent(true)}
+              disabled={isInitialized}
+            >
+              <AppText
+                style={[
+                  styles.registerScreen.toggleText,
+                  isStudent && styles.registerScreen.toggleTextActive,
+                ]}
+              >
+                {t("student")}
+              </AppText>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.registerScreen.toggleButton,
+                !isStudent && styles.registerScreen.toggleButtonActive,
+              ]}
+              onPress={() => setIsStudent(false)}
+              disabled={isInitialized}
+            >
+              <AppText
+                style={[
+                  styles.registerScreen.toggleText,
+                  !isStudent && styles.registerScreen.toggleTextActive,
+                ]}
+              >
+                {t("teacher")}
+              </AppText>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.registerScreen.inputContainer}>
+          <AppText style={styles.registerScreen.label}>{t("name")} *</AppText>
+          <TextInput
+            style={[
+              styles.registerScreen.input,
+              errors.name && styles.registerScreen.inputError,
+            ]}
+            value={formData.name}
+            onChangeText={(text) => handleInputChange("name", text)}
+            textAlign={language === "ar" ? "right" : "left"}
+            editable={!isLoading}
+          />
+          {errors.name && (
+            <AppText style={styles.registerScreen.errorText}>
+              {errors.name}
             </AppText>
           )}
+        </View>
 
-          <View style={styles.homeScreen.signupContainer}>
-            <AppText style={styles.registerScreen.label}>
-              {isEnabled ? t("student") : t("teacher")}
+        <View style={styles.registerScreen.inputContainer}>
+          <AppText style={styles.registerScreen.label}>{t("phone")} *</AppText>
+          <TextInput
+            style={[
+              styles.registerScreen.input,
+              errors.phone && styles.registerScreen.inputError,
+            ]}
+            value={formData.phone}
+            onChangeText={(text) => handleInputChange("phone", text)}
+            keyboardType="phone-pad"
+            textAlign={language === "ar" ? "right" : "left"}
+            editable={!isLoading}
+          />
+          {errors.phone && (
+            <AppText style={styles.registerScreen.errorText}>
+              {errors.phone}
             </AppText>
-            <Switch
-              value={isEnabled}
-              onValueChange={setIsEnabled}
-              thumbColor={isEnabled ? "#fff" : "#f4f3f4"}
-              trackColor={{ false: "#767577", true: "#81b0ff" }}
-            />
-          </View>
+          )}
+        </View>
 
-          <View style={styles.registerScreen.inputContainer}>
-            <AppText style={styles.registerScreen.label}>{t("name")} *</AppText>
-            <TextInput
-              style={[
-                styles.registerScreen.input,
-                errors.name && styles.registerScreen.inputError,
-              ]}
-              value={formData.name}
-              onChangeText={(text) => handleInputChange("name", text)}
-              textAlign={language === "ar" ? "right" : "left"}
-              editable={!isLoading}
-            />
-            {errors.name && (
-              <AppText style={styles.registerScreen.errorText}>
-                {errors.name}
-              </AppText>
-            )}
-          </View>
-
-          <View style={styles.registerScreen.inputContainer}>
-            <AppText style={styles.registerScreen.label}>
-              {t("phone")} *
+        <View style={styles.registerScreen.inputContainer}>
+          <AppText style={styles.registerScreen.label}>
+            {t("password")} {isEdit && "*"}
+          </AppText>
+          <TextInput
+            style={[
+              styles.registerScreen.input,
+              errors.password && styles.registerScreen.inputError,
+            ]}
+            value={formData.password}
+            onChangeText={(text) => handleInputChange("password", text)}
+            secureTextEntry={true}
+            textAlign={language === "ar" ? "right" : "left"}
+            editable={!isLoading}
+          />
+          {errors.password && (
+            <AppText style={styles.registerScreen.errorText}>
+              {errors.password}
             </AppText>
-            <TextInput
-              style={[
-                styles.registerScreen.input,
-                errors.phone && styles.registerScreen.inputError,
-              ]}
-              value={formData.phone}
-              onChangeText={(text) => handleInputChange("phone", text)}
-              keyboardType="phone-pad"
-              textAlign={language === "ar" ? "right" : "left"}
-              editable={!isLoading}
-            />
-            {errors.phone && (
-              <AppText style={styles.registerScreen.errorText}>
-                {errors.phone}
-              </AppText>
-            )}
-          </View>
+          )}
+        </View>
 
-          <View style={styles.registerScreen.inputContainer}>
-            <AppText style={styles.registerScreen.label}>
-              {t("password")} {isEdit && "*"}
+        <View style={styles.registerScreen.inputContainer}>
+          <AppText style={styles.registerScreen.label}>
+            {t("password_confirmation")} {isEdit && "*"}
+          </AppText>
+          <TextInput
+            style={[
+              styles.registerScreen.input,
+              errors.confirm_password && styles.registerScreen.inputError,
+            ]}
+            value={formData.password_confirmation}
+            onChangeText={(text) =>
+              handleInputChange("password_confirmation", text)
+            }
+            secureTextEntry={true}
+            textAlign={language === "ar" ? "right" : "left"}
+            editable={!isLoading}
+          />
+          {errors.confirm_password && (
+            <AppText style={styles.registerScreen.errorText}>
+              {errors.confirm_password}
             </AppText>
-            <TextInput
-              style={[
-                styles.registerScreen.input,
-                errors.password && styles.registerScreen.inputError,
-              ]}
-              value={formData.password}
-              onChangeText={(text) => handleInputChange("password", text)}
-              secureTextEntry={true}
-              textAlign={language === "ar" ? "right" : "left"}
-              editable={!isLoading}
-            />
-            {errors.password && (
-              <AppText style={styles.registerScreen.errorText}>
-                {errors.password}
-              </AppText>
-            )}
-          </View>
-
-          <View style={styles.registerScreen.inputContainer}>
-            <AppText style={styles.registerScreen.label}>
-              {t("password_confirmation")} {isEdit && "*"}
-            </AppText>
-            <TextInput
-              style={[
-                styles.registerScreen.input,
-                errors.confirm_password && styles.registerScreen.inputError,
-              ]}
-              value={formData.password_confirmation}
-              onChangeText={(text) =>
-                handleInputChange("password_confirmation", text)
-              }
-              secureTextEntry={true}
-              textAlign={language === "ar" ? "right" : "left"}
-              editable={!isLoading}
-            />
-            {errors.confirm_password && (
-              <AppText style={styles.registerScreen.errorText}>
-                {errors.confirm_password}
-              </AppText>
-            )}
-          </View>
-
-          <View style={styles.registerScreen.buttonsContainer}>
-            <PrimaryButton
-              title={
-                isLoading
-                  ? isEdit
-                    ? t("updating")
-                    : t("registering")
-                  : isEdit
-                  ? t("updateButton")
-                  : t("registerButton")
-              }
-              onPress={handleSubmit}
-              theme={theme}
-              disabled={isLoading}
-            />
-          </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

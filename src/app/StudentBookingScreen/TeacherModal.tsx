@@ -28,7 +28,7 @@ const TeachersModal: React.FC<TeachersModalProps> = React.memo(
           <View style={styles.modalContainer}>
             {/* Header */}
             <View style={styles.header}>
-              <AppText style={styles.headerTitle}>اختر المدرس</AppText>
+              <AppText style={styles.headerTitle}>اختر المعلم</AppText>
               <TouchableOpacity style={styles.closeButton} onPress={onClose}>
                 <Ionicons name="close" size={24} color="#666" />
               </TouchableOpacity>

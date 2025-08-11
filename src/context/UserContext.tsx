@@ -96,7 +96,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
             await AsyncStorage.setItem("user", JSON.stringify(userData));
           }
         } catch (apiError) {
-          console.log("فشل تحميل البروفايل:", apiError);
+          console.log("فشل تحميل الملف الشخصي:", apiError);
           await clearStorageAndUser();
         }
       } catch (error) {
@@ -180,8 +180,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
           await AsyncStorage.setItem("user", JSON.stringify(userData));
         }
       } catch (profileError) {
-        console.log("خطأ في جلب البروفايل:", profileError);
-        // مسح البيانات المحفوظة إذا فشل جلب البروفايل
+        console.log("خطأ في جلب الملف الشخصي:", profileError);
+        // مسح البيانات المحفوظة إذا فشل جلب الملف الشخصي
         await clearStorageAndUser();
         throw new Error("فشل في جلب بيانات المستخدم");
       }
@@ -205,6 +205,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       }
     } finally {
       setIsLoading(false);
+      await refreshUser();
     }
   };
 
@@ -295,7 +296,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       //   await updateTeacherProfile(request);
       // }
 
-      // جلب البروفايل المحدث
+      // جلب الملف الشخصي المحدث
       const profile =
         user.type === UserType.student
           ? await getStudentProfile()

@@ -29,7 +29,7 @@ export const createStyles = (theme: Theme) => {
     container: {
       flex: 1,
       backgroundColor: theme.background.primary,
-      paddingHorizontal: 0,
+      paddingHorizontal: 20,
       // paddingTop: Platform.OS === "ios" ? insets.top : statusBarHeight,
     },
     langText: {
@@ -41,41 +41,65 @@ export const createStyles = (theme: Theme) => {
     },
     logoContainer: {
       alignItems: "center",
-      justifyContent: "center",
-      marginTop: 20,
+      marginTop: 30,
       marginBottom: 40,
     },
-    logoPlaceholder: {
-      width: 150,
-      height: 150,
-      // backgroundColor: "#063159",
-      borderRadius: 100,
+
+    logoWrapper: {
+      width: 160,
+      height: 160,
+      borderRadius: 80,
       justifyContent: "center",
       alignItems: "center",
-      borderWidth: 2,
-      borderColor: "#e0e0e0",
+      backgroundColor: "#fff",
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      elevation: 5,
+      marginBottom: 20,
       overflow: "hidden",
     },
-    descriptionContainer: {
+
+    imageStyle: {
+      width: "100%",
+      height: "100%",
+      resizeMode: "cover",
+    },
+
+    textContainer: {
       alignItems: "center",
-      justifyContent: "center",
-      marginBottom: 20,
       paddingHorizontal: 20,
     },
-    descriptionText: {
-      fontSize: 24,
-      color: "#2c3e50",
-      textAlign: "center",
-      lineHeight: 36,
-      marginBottom: 12,
-      includeFontPadding: false,
+
+    greetingText: {
+      fontSize: 22,
+      fontWeight: "600",
+      color: "#34495e",
+      marginBottom: 6,
     },
+
+    titleText: {
+      fontSize: 28,
+      fontWeight: "700",
+      color: "#063159",
+      marginBottom: 8,
+    },
+    descriptionContainer: {
+      marginVertical: 30,
+    },
+    descriptionText: {
+      fontSize: 19,
+      color: "#7f8c8d",
+      textAlign: "center",
+      lineHeight: 35,
+    },
+
     subDescriptionText: {
       fontSize: 16,
-      color: "#2c3e50",
+      color: "#7f8c8d",
       textAlign: "center",
       lineHeight: 24,
-      includeFontPadding: false,
     },
     footerContainer: {
       flex: 1,
@@ -124,11 +148,17 @@ export const createStyles = (theme: Theme) => {
     },
     iconContainer: {
       position: "absolute",
+      top: 15,
+      right: 15,
+      zIndex: 10,
+    },
+    langContainer: {
+      position: "absolute",
       top: 10,
       right: 10,
       zIndex: 10,
     },
-    imageStyle: {
+    imageStyle1: {
       width: 180,
       height: 180,
       resizeMode: "contain",
@@ -142,6 +172,95 @@ export const createStyles = (theme: Theme) => {
       backgroundColor: "rgba(0,0,0,0.3)",
       justifyContent: "center",
       alignItems: "center",
+    },
+    header: {
+      backgroundColor: "#7c3aed",
+      padding: 20,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      borderBottomLeftRadius: 20,
+      borderBottomRightRadius: 20,
+    },
+    headerGradient: {
+      borderBottomLeftRadius: 20,
+      borderBottomRightRadius: 20,
+      overflow: "hidden", // مهم عشان البوردر يبان صح
+      marginBottom: 10,
+    },
+    headerContent: {
+      padding: 20,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    welcomeText: {
+      fontSize: 22,
+      fontWeight: "600",
+      color: "#fff",
+    },
+    subWelcomeText: {
+      fontSize: 16,
+      color: "#E0E0E0",
+    },
+    iconBorder: {
+      borderWidth: 1,
+      borderColor: "#fff",
+      padding: 8,
+      borderRadius: 50,
+    },
+    // welcomeText: {
+    //   fontSize: 22,
+    //   fontWeight: "600",
+    //   color: "#fff",
+    // },
+    // subWelcomeText: {
+    //   fontSize: 16,
+    //   color: "#dfe6e9",
+    // },
+    cardsContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "center",
+      marginTop: 20,
+      paddingHorizontal: 10,
+    },
+    card: {
+      backgroundColor: "#fff",
+      borderRadius: 15,
+      width: "45%",
+      padding: 15,
+      margin: 8,
+      alignItems: "center",
+      justifyContent: "center",
+      shadowColor: "#000",
+      shadowOpacity: 0.1,
+      shadowOffset: { width: 0, height: 3 },
+      shadowRadius: 5,
+      elevation: 4,
+    },
+    cardText: {
+      marginTop: 8,
+      fontSize: 16,
+      color: "#063159",
+      textAlign: "center",
+    },
+    footer: {
+      alignItems: "center",
+      marginTop: "auto",
+      paddingBottom: 30,
+    },
+    logo: {
+      width: 100,
+      height: 100,
+      resizeMode: "contain",
+      marginBottom: 10,
+      borderRadius: 8,
+    },
+    footerText: {
+      textAlign: "center",
+      fontSize: 14,
+      color: "#636e72",
     },
   });
 
@@ -279,12 +398,6 @@ export const createStyles = (theme: Theme) => {
   const registerScreenStyles = StyleSheet.create({
     scrollContainer: {
       flex: 1,
-      paddingHorizontal: 20,
-    },
-    formContainer: {
-      padding: 10,
-      paddingTop:
-        Platform.OS === "ios" ? 10 + insets.top : 10 + statusBarHeight,
     },
     title: {
       fontSize: 24,
@@ -341,6 +454,30 @@ export const createStyles = (theme: Theme) => {
       flex: 1,
     },
     loading: { flex: 1, justifyContent: "center", alignItems: "center" },
+    toggleContainer: {
+      flexDirection: "row",
+      backgroundColor: "#e5e7eb", // رمادي فاتح
+      borderRadius: 25,
+      padding: 4,
+      marginVertical: 15,
+    },
+    toggleButton: {
+      flex: 1,
+      paddingVertical: 10,
+      borderRadius: 20,
+      alignItems: "center",
+    },
+    toggleButtonActive: {
+      backgroundColor: "#4F46E5", // نفس لون الجرادينت
+    },
+    toggleText: {
+      fontSize: 16,
+      fontWeight: "500",
+      color: "#374151", // رمادي غامق
+    },
+    toggleTextActive: {
+      color: "#fff",
+    },
   });
 
   const teacherScreenStyles = StyleSheet.create({
@@ -1096,7 +1233,6 @@ export const createStyles = (theme: Theme) => {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      paddingHorizontal: 20,
       paddingVertical: 15,
       backgroundColor: "#FFF",
       borderBottomWidth: 1,
@@ -1111,7 +1247,6 @@ export const createStyles = (theme: Theme) => {
       padding: 8,
     },
     bookNowContainer: {
-      paddingHorizontal: 20,
       paddingVertical: 5,
       backgroundColor: "#FFF",
     },
@@ -1289,7 +1424,6 @@ export const createStyles = (theme: Theme) => {
     },
     scrollView: {
       flex: 1,
-      padding: 20,
     },
     title: {
       fontSize: 24,
@@ -1450,7 +1584,6 @@ export const createStyles = (theme: Theme) => {
       alignItems: "center",
       justifyContent: "center",
       paddingVertical: 15,
-      paddingHorizontal: 20,
       borderRadius: 12,
       borderWidth: 2,
       borderColor: "#7C3AED",
@@ -1472,7 +1605,6 @@ export const createStyles = (theme: Theme) => {
       alignItems: "center",
       backgroundColor: "#FFF",
       paddingVertical: 15,
-      paddingHorizontal: 20,
       borderRadius: 12,
       borderWidth: 1,
       borderColor: "#E1E8ED",
@@ -1522,7 +1654,6 @@ export const createStyles = (theme: Theme) => {
       borderTopLeftRadius: 20,
       borderTopRightRadius: 20,
       maxHeight: height * 0.8,
-      paddingHorizontal: 20,
       paddingTop: 20,
     },
     header: {
@@ -1603,7 +1734,6 @@ export const createStyles = (theme: Theme) => {
     header: {
       paddingTop: 60,
       paddingBottom: 30,
-      paddingHorizontal: 20,
       borderBottomLeftRadius: 30,
       borderBottomRightRadius: 30,
     },
@@ -1659,7 +1789,6 @@ export const createStyles = (theme: Theme) => {
       marginLeft: 5,
     },
     infoSection: {
-      paddingHorizontal: 20,
       paddingTop: 20,
     },
     infoCard: {
@@ -1699,7 +1828,6 @@ export const createStyles = (theme: Theme) => {
       color: "#1F2937",
     },
     section: {
-      paddingHorizontal: 20,
       paddingTop: 20,
     },
     sectionTitle: {
@@ -1841,7 +1969,6 @@ export const createStyles = (theme: Theme) => {
       color: "#065F46",
     },
     actionButtons: {
-      paddingHorizontal: 20,
       paddingTop: 30,
       gap: 12,
     },

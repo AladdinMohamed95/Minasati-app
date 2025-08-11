@@ -241,7 +241,7 @@ const StudentBookingScreen = () => {
       attendanceMode === "online" &&
       !selectedTeacherData.availability.online
     ) {
-      Alert.alert("خطأ", "هذا المدرس غير متاح للحصص الأونلاين");
+      Alert.alert("خطأ", "هذا المعلم غير متاح للحصص الأونلاين");
       return;
     }
 
@@ -249,7 +249,7 @@ const StudentBookingScreen = () => {
       attendanceMode === "offline" &&
       !selectedTeacherData.availability.offline
     ) {
-      Alert.alert("خطأ", "هذا المدرس غير متاح للحصص الحضورية");
+      Alert.alert("خطأ", "هذا المعلم غير متاح للحصص الحضورية");
       return;
     }
 
@@ -317,14 +317,25 @@ const StudentBookingScreen = () => {
     !user?.id;
 
   return (
-    <SafeAreaView style={styles.studentBookingViewStyles.container}>
+    <SafeAreaView style={styles.homeScreen.container}>
       <ScrollView
         style={styles.studentBookingViewStyles.scrollView}
         showsVerticalScrollIndicator={false}
       >
-        <AppText style={styles.studentBookingViewStyles.title}>
-          حجز حصة دراسية
-        </AppText>
+        <LinearGradient
+          colors={["#4F46E5", "#7C3AED"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.homeScreen.headerGradient}
+        >
+          <View style={styles.homeScreen.headerContent}>
+            <View>
+              <AppText style={styles.homeScreen.welcomeText}>
+                حجز حصة دراسية
+              </AppText>
+            </View>
+          </View>
+        </LinearGradient>
         {/* System Selection */}
         <View style={styles.studentBookingViewStyles.inputContainer}>
           <AppText style={styles.studentBookingViewStyles.label}>
@@ -441,7 +452,7 @@ const StudentBookingScreen = () => {
         {teachers.length > 0 && (
           <View style={styles.studentBookingViewStyles.inputContainer}>
             <AppText style={styles.studentBookingViewStyles.label}>
-              اختر المدرس
+              اختر المعلم
             </AppText>
             {loading.teachers ? (
               <ActivityIndicator
@@ -491,7 +502,7 @@ const StudentBookingScreen = () => {
                     <AppText
                       style={styles.studentBookingViewStyles.selectTeacherText}
                     >
-                      اختر المدرس
+                      اختر المعلم
                     </AppText>
                   )}
                   <Ionicons name="chevron-down" size={20} color="#7C3AED" />

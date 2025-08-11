@@ -142,26 +142,6 @@ export interface TeacherProfileResponse {
 }
 export interface TeacherClassesResponse {
   data: ClassItem[];
-  links: {
-    first: string;
-    last: string;
-    prev: string | null;
-    next: string | null;
-  };
-  meta: {
-    current_page: number;
-    from: number;
-    last_page: number;
-    links: {
-      url: string | null;
-      label: string;
-      active: boolean;
-    }[];
-    path: string;
-    per_page: number;
-    to: number;
-    total: number;
-  };
 }
 //-----------------------------------
 
@@ -220,6 +200,7 @@ export interface RegistrationItem {
   class_name: string;
   registration_status: string;
   class_price: number;
+  currency: string;
   registration_id: number;
   academic_context: AcademicYear;
 }
