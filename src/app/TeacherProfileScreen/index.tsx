@@ -4,7 +4,7 @@ import {
 } from "@/api/teachersMiddleware.api";
 import * as ImagePicker from "expo-image-picker";
 // @ts-ignore
-import Logo from "@/assets/images/icon.webp";
+import Logo from "@/assets/images/icon.png";
 import { SecondaryButton } from "@/components/AppButton";
 import AppText from "@/components/AppText";
 import { HelloWave } from "@/components/HelloWave";
@@ -213,6 +213,22 @@ const TeacherProfileScreen = () => {
           </View>
           <View style={styles.profileViewStyles.row}>
             <AppText style={styles.profileViewStyles.label}>
+              {t("city")}
+            </AppText>
+            <AppText style={styles.profileViewStyles.value}>
+              {profile.profile.city || t("notSpecified")}
+            </AppText>
+          </View>
+          <View style={styles.profileViewStyles.row}>
+            <AppText style={styles.profileViewStyles.label}>
+              {t("district")}
+            </AppText>
+            <AppText style={styles.profileViewStyles.value}>
+              {profile.profile.district || t("notSpecified")}
+            </AppText>
+          </View>
+          <View style={styles.profileViewStyles.row}>
+            <AppText style={styles.profileViewStyles.label}>
               {t("workAddress")}
             </AppText>
             <AppText style={styles.profileViewStyles.value}>
@@ -229,6 +245,14 @@ const TeacherProfileScreen = () => {
                 : profile.availability.offline
                 ? t("offline")
                 : t("notSpecified")}
+            </AppText>
+          </View>
+          <View style={styles.profileViewStyles.row}>
+            <AppText style={styles.profileViewStyles.label}>
+              {t("homeAvailability")}
+            </AppText>
+            <AppText style={styles.profileViewStyles.value}>
+              {profile.home_availability || t("notSpecified")}
             </AppText>
           </View>
         </View>

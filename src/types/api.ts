@@ -35,7 +35,26 @@ export type StudentProfileResponse = {
   phone: string;
   registered_at: string;
 };
+//-----------------------------------
+export type ComplaintResponse = {
+  id: number;
+  subject: string;
+  message: string;
+  status: string;
+  submitted_at: string;
+  complaint_about_teacher: {
+    id: number;
+    name: string;
+    phone: string | null;
+    image_url: string | null;
+  } | null;
+};
 
+export type ComplaintRequest = {
+  subject: string;
+  message: string;
+  teacher_id?: string;
+};
 //-----------------------------------
 export interface Booking {
   booking_id: number;
@@ -62,7 +81,15 @@ export type BookingResponse = {
 };
 
 //-----------------------------------
-
+export interface Teacher {
+  id: number;
+  name: string;
+  subject: string;
+  online_available: boolean;
+  offline_available: boolean;
+  rating?: number;
+  experience_years?: number;
+}
 export interface TeacherAvailableClasses {
   id: number;
   name: string;
@@ -117,6 +144,9 @@ export interface TeacherProfileRequest {
   work_address: string;
   password: string;
   password_confirmation: string;
+  city: string;
+  district: string;
+  home_availability: boolean;
 }
 export interface TeacherProfileResponse {
   id: number;

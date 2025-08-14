@@ -50,6 +50,9 @@ const TeacherEditScreen = () => {
     is_online: false,
     is_offline: false,
     country: "",
+    city: "",
+    district: "",
+    home_availability: false,
   });
 
   const [errors, setErrors] = useState<
@@ -79,6 +82,9 @@ const TeacherEditScreen = () => {
           is_online: teacherData.availability?.online || false,
           is_offline: teacherData.availability?.offline || false,
           country: teacherData.profile?.country || "",
+          city: teacherData.profile?.city || "",
+          district: teacherData.profile?.district || "",
+          home_availability: teacherData.profile?.home_availability || false,
         });
 
         setIsInitialized(true);
@@ -108,35 +114,12 @@ const TeacherEditScreen = () => {
       Record<keyof TeacherProfileRequest | "confirm_password", string>
     > = {};
 
-    if (!formData.name?.trim()) newErrors.name = t("nameError");
-    if (!formData.specialization?.trim())
-      newErrors.specialization = t("specializationError");
-    if (!formData.work_title?.trim())
-      newErrors.work_title = t("workTitleError");
-
     if (formData.password?.trim()) {
-      if (formData.password.length < 6) {
-        newErrors.password = t("passwordTooShortError");
-      }
       if (!formData.password_confirmation?.trim()) {
         newErrors.confirm_password = t("confirmPasswordRequiredError");
       } else if (formData.password !== formData.password_confirmation) {
         newErrors.confirm_password = t("passwordsDoNotMatchError");
       }
-    }
-
-    if (formData.years_of_experience) {
-      const years = formData.years_of_experience;
-      if (isNaN(years) || years < 0) {
-        newErrors.years_of_experience = t("yearsExperienceError");
-      }
-    }
-
-    if (
-      !formData.national_id_egypt?.trim() &&
-      !formData.residence_number_outside_egypt?.trim()
-    ) {
-      newErrors.national_id_egypt = t("identificationError");
     }
 
     setErrors(newErrors);
@@ -145,7 +128,7 @@ const TeacherEditScreen = () => {
 
   const handleSubmit = async () => {
     if (!validateForm()) {
-      return Alert.alert(t("dataError"), t("fillAllRequiredFields"));
+      return Alert.alert(t("dataError"), t("fixFields"));
     }
 
     setIsLoading(true);
@@ -157,6 +140,8 @@ const TeacherEditScreen = () => {
         country: formData.country,
         work_title: formData.work_title,
         phone2: formData.phone2,
+        city: formData.city,
+        district: formData.district,
         home_address: formData.home_address,
         work_address: formData.work_address,
         desc: formData.desc,
@@ -167,6 +152,7 @@ const TeacherEditScreen = () => {
         residence_number_outside_egypt: formData.residence_number_outside_egypt,
         is_online: formData.is_online,
         is_offline: formData.is_offline,
+        home_availability: formData.home_availability,
         ...(formData.password?.trim() && {
           password: formData.password,
           password_confirmation: formData.password_confirmation,
@@ -236,8 +222,6 @@ const TeacherEditScreen = () => {
         </View>
       </LinearGradient>
       <ScrollView style={styles.registerScreen.scrollContainer}>
-        <AppText style={styles.registerScreen.title}>{t("edit")}</AppText>
-
         <View style={styles.registerScreen.inputContainer}>
           <AppText style={styles.registerScreen.label}>{t("name")} *</AppText>
           <TextInput
@@ -383,6 +367,44 @@ const TeacherEditScreen = () => {
           {errors.current_workplace && (
             <AppText style={styles.registerScreen.errorText}>
               {errors.current_workplace}
+            </AppText>
+          )}
+        </View>
+
+        <View style={styles.registerScreen.inputContainer}>
+          <AppText style={styles.registerScreen.label}>{t("city")}</AppText>
+          <TextInput
+            style={[
+              styles.registerScreen.input,
+              errors.city && styles.registerScreen.inputError,
+            ]}
+            value={formData.city}
+            onChangeText={(text) => handleInputChange("city", text)}
+            textAlign={language === "ar" ? "right" : "left"}
+            editable={!isLoading}
+          />
+          {errors.city && (
+            <AppText style={styles.registerScreen.errorText}>
+              {errors.city}
+            </AppText>
+          )}
+        </View>
+
+        <View style={styles.registerScreen.inputContainer}>
+          <AppText style={styles.registerScreen.label}>{t("district")}</AppText>
+          <TextInput
+            style={[
+              styles.registerScreen.input,
+              errors.district && styles.registerScreen.inputError,
+            ]}
+            value={formData.district}
+            onChangeText={(text) => handleInputChange("district", text)}
+            textAlign={language === "ar" ? "right" : "left"}
+            editable={!isLoading}
+          />
+          {errors.district && (
+            <AppText style={styles.registerScreen.errorText}>
+              {errors.district}
             </AppText>
           )}
         </View>
@@ -548,6 +570,22 @@ const TeacherEditScreen = () => {
             trackColor={{ false: "#767577", true: "#81b0ff" }}
           />
         </View>
+
+        {formData.is_offline === true && (
+          <View style={styles.homeScreen.signupContainer}>
+            <AppText style={styles.registerScreen.label}>
+              {t("homeAvaiability")}
+            </AppText>
+            <Switch
+              value={formData.home_availability}
+              onValueChange={(value) =>
+                handleInputChange("home_availability", value)
+              }
+              thumbColor={formData.home_availability ? "#fff" : "#f4f3f4"}
+              trackColor={{ false: "#767577", true: "#81b0ff" }}
+            />
+          </View>
+        )}
 
         <View style={styles.registerScreen.buttonsContainer}>
           <PrimaryButton

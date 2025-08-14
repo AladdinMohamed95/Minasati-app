@@ -2,8 +2,11 @@ import {
   Booking,
   BookingRequest,
   BookingResponse,
+  ComplaintRequest,
+  ComplaintResponse,
   RegisterRequest,
   StudentProfileResponse,
+  Teacher,
 } from "@/types/api";
 import api from ".";
 
@@ -71,16 +74,28 @@ export const deleteBooking = async (
   const response = await api.delete(`/api/student/bookings/${bookingId}`);
   return response.data as { message: string };
 };
+// export const showComplaints = async (): Promise<ComplaintResponse[]> => {
+//   const response = await api.get("/api/student/complaints");
+//   return response.data;
+// };
+export const showComplaints = async (): Promise<ComplaintResponse[]> => {
+  const response = await api.get("/api/student/complaints");
+  const payload = response.data;
+  return Array.isArray(payload) ? payload : payload?.data ?? [];
+};
 
-export interface Teacher {
-  id: number;
-  name: string;
-  subject: string;
-  online_available: boolean;
-  offline_available: boolean;
-  rating?: number;
-  experience_years?: number;
-}
+export const getComplaints = async (params?: any) => {
+  const response = await api.get("/api/student/complaints", { params });
+  return response.data;
+};
+
+export const createComplaint = async (
+  request: ComplaintRequest
+): Promise<{ message: string }> => {
+  const response = await api.post("/api/student/complaints", { request });
+  console.log("create complaint ", response);
+  return response.data as { message: string };
+};
 
 export const getTeachers = async (
   classId: number,

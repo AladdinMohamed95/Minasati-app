@@ -1067,7 +1067,7 @@ export const createStyles = (theme: Theme) => {
 
   const profileStyles = StyleSheet.create({
     scrollContainer: {
-      padding: 16,
+      paddingVertical: 10,
     },
     imageContainer: {
       alignItems: "center",
@@ -1228,7 +1228,7 @@ export const createStyles = (theme: Theme) => {
       borderWidth: 1,
       borderColor: "#007bff",
     },
-    scrollView: { flex: 1, paddingHorizontal: 10 },
+    scrollView: { flex: 1 },
     header: {
       flexDirection: "row",
       justifyContent: "space-between",
@@ -1294,7 +1294,7 @@ export const createStyles = (theme: Theme) => {
       fontWeight: getFontWeight(theme.fontWeight.bold),
     },
     bookingsContainer: {
-      padding: 15,
+      paddingVertical: 10,
     },
     bookingsCount: {
       fontSize: 16,
@@ -1389,7 +1389,7 @@ export const createStyles = (theme: Theme) => {
     detailRow: {
       flexDirection: "row",
       alignItems: "center",
-      marginBottom: 10,
+      marginBottom: 5,
     },
     detailLabel: {
       fontSize: 14,

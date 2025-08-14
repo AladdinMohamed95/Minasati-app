@@ -7,6 +7,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { Image, View } from "react-native";
 import TeacherInfoModal from "./teacherInfoModal";
+import { getStatusColor } from "@/utils";
 
 type RenderBookingCardProps = {
   booking: Booking;
@@ -30,21 +31,7 @@ const formatTime = (dateString: string) => {
   });
 };
 
-const getStatusColor = (status: string) => {
-  switch (status?.toLowerCase()) {
-    case "confirmed":
-    case "مؤكد":
-      return "#4CAF50";
-    case "pending":
-    case "في الانتظار":
-      return "#FF9800";
-    case "cancelled":
-    case "ملغي":
-      return "#F44336";
-    default:
-      return "#757575";
-  }
-};
+
 
 const RenderBookingCard = React.memo(
   ({ booking, handleDeleteBooking }: RenderBookingCardProps) => {

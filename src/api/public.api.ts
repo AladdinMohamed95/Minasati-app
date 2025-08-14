@@ -53,7 +53,7 @@ export const getClasses = async (params: {
   return response.data.data;
 };
 
-export const getTeachers = async (params: {
+export const getTeachers = async (params?: {
   class_ids?: string;
   mode?: string;
   specialization?: string;

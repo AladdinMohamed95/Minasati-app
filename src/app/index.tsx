@@ -22,7 +22,9 @@ const HomeScreen = () => {
   const handleBooking = () => {
     router.push("/StudentBookingScreen");
   };
-
+  const handleComplain = () => {
+    router.push("/StudentComplaint");
+  };
   const handleIconPress = useCallback(() => {
     if (user) {
       if (user.type === UserType.student) {
@@ -87,13 +89,26 @@ const HomeScreen = () => {
       {/* Cards Section */}
       <View style={styles.homeScreen.cardsContainer}>
         {user?.type !== UserType.teacher ? (
-          <TouchableOpacity
-            style={styles.homeScreen.card}
-            onPress={handleBooking}
-          >
-            <Ionicons name="calendar-outline" size={30} color="#063159" />
-            <AppText style={styles.homeScreen.cardText}>{t("booknow")}</AppText>
-          </TouchableOpacity>
+          <>
+            <TouchableOpacity
+              style={styles.homeScreen.card}
+              onPress={handleBooking}
+            >
+              <Ionicons name="calendar-outline" size={30} color="#063159" />
+              <AppText style={styles.homeScreen.cardText}>
+                {t("booknow")}
+              </AppText>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.homeScreen.card}
+              onPress={handleComplain}
+            >
+              <Ionicons name="calendar-outline" size={30} color="#063159" />
+              <AppText style={styles.homeScreen.cardText}>
+                {t("complaint")}
+              </AppText>
+            </TouchableOpacity>
+          </>
         ) : (
           <>
             <TouchableOpacity

@@ -1354,135 +1354,154 @@ export default function TeacherBookingScreen() {
           <AppText style={{ fontSize: 18, marginBottom: 10 }}>
             {t("addedClassed")} ({pendingRegistrations.length})
           </AppText>
-
-          {pendingRegistrations.length === 0 ? (
-            <View
-              style={{
-                paddingVertical: 20,
-                backgroundColor: "#f9f9f9",
-                borderRadius: 8,
-              }}
-            >
-              <AppText style={{ textAlign: "center", color: "#888" }}>
-                {t("noClassAdded")}
-              </AppText>
-            </View>
-          ) : (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    paddingVertical: 12,
-                    backgroundColor: "#f5f5f5",
-                    borderRadius: 8,
-                    minWidth: 900,
-                    borderWidth: 1,
-                    borderColor: "#aaa",
-                  }}
-                >
-                  <AppText
-                    style={{ fontSize: 12, width: 150, textAlign: "center" }}
-                  >
-                    {t("classItem")}
-                  </AppText>
-                  <AppText
-                    style={{ fontSize: 12, width: 80, textAlign: "center" }}
-                  >
-                    {t("price")}
-                  </AppText>
-                  <AppText
-                    style={{ fontSize: 12, width: 80, textAlign: "center" }}
-                  >
-                    {t("currency")}
-                  </AppText>
-                  <AppText
-                    style={{ fontSize: 12, width: 120, textAlign: "center" }}
-                  >
-                    {t("class")}
-                  </AppText>
-                  <AppText
-                    style={{ fontSize: 12, width: 120, textAlign: "center" }}
-                  >
-                    {t("stage")}
-                  </AppText>
-                  <AppText
-                    style={{ fontSize: 12, width: 150, textAlign: "center" }}
-                  >
-                    {t("system")}
-                  </AppText>
-                  <AppText
-                    style={{ fontSize: 12, width: 150, textAlign: "center" }}
-                  >
-                    {t("action")}
-                  </AppText>
-                </View>
-
-                {pendingRegistrations.map((registration) => (
+          <View style={{ backgroundColor: "#fff", padding: 5 }}>
+            {pendingRegistrations.length === 0 ? (
+              <View
+                style={{
+                  paddingVertical: 20,
+                  backgroundColor: "#f9f9f9",
+                  borderRadius: 8,
+                }}
+              >
+                <AppText style={{ textAlign: "center", color: "#888" }}>
+                  {t("noClassAdded")}
+                </AppText>
+              </View>
+            ) : (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View>
                   <View
-                    key={registration.id}
                     style={{
                       flexDirection: "row",
                       paddingVertical: 12,
-                      borderBottomWidth: 1,
-                      borderColor: "#aaa",
-                      alignItems: "center",
+                      backgroundColor: "#f5f5f5",
+                      borderRadius: 8,
                       minWidth: 900,
-                      backgroundColor: "#f0f8ff",
-                      // minWidth: 500, // عرض الجدول
+                      borderWidth: 1,
+                      borderColor: "#aaa",
                     }}
                   >
                     <AppText
                       style={{ fontSize: 12, width: 150, textAlign: "center" }}
                     >
-                      {registration.class_name}
+                      {t("classItem")}
                     </AppText>
                     <AppText
                       style={{ fontSize: 12, width: 80, textAlign: "center" }}
                     >
-                      {registration.class_price}
+                      {t("price")}
                     </AppText>
                     <AppText
                       style={{ fontSize: 12, width: 80, textAlign: "center" }}
                     >
-                      {registration.currency}
+                      {t("currency")}
                     </AppText>
                     <AppText
                       style={{ fontSize: 12, width: 120, textAlign: "center" }}
                     >
-                      {registration.academic_context?.name}
+                      {t("class")}
                     </AppText>
                     <AppText
                       style={{ fontSize: 12, width: 120, textAlign: "center" }}
                     >
-                      {registration.academic_context?.academic_stage.name}
+                      {t("stage")}
                     </AppText>
                     <AppText
                       style={{ fontSize: 12, width: 150, textAlign: "center" }}
                     >
-                      {
-                        registration.academic_context?.academic_stage
-                          .educational_system.name
-                      }
+                      {t("system")}
                     </AppText>
-                    <TouchableOpacity
-                      style={{
-                        backgroundColor: "#ff4444",
-                        paddingVertical: 6,
-                        paddingHorizontal: 12,
-                        borderRadius: 4,
-                      }}
-                      onPress={() => removePendingRegistration(registration.id)}
+                    <AppText
+                      style={{ fontSize: 12, width: 150, textAlign: "center" }}
                     >
-                      <AppText style={{ color: "white", fontSize: 12 }}>
-                        {t("remove")}
-                      </AppText>
-                    </TouchableOpacity>
+                      {t("action")}
+                    </AppText>
                   </View>
-                ))}
-              </View>
-            </ScrollView>
-          )}
+
+                  {pendingRegistrations.map((registration) => (
+                    <View
+                      key={registration.id}
+                      style={{
+                        flexDirection: "row",
+                        paddingVertical: 12,
+                        borderBottomWidth: 1,
+                        borderColor: "#aaa",
+                        alignItems: "center",
+                        minWidth: 900,
+                        backgroundColor: "#f0f8ff",
+                        // minWidth: 500, // عرض الجدول
+                      }}
+                    >
+                      <AppText
+                        style={{
+                          fontSize: 12,
+                          width: 150,
+                          textAlign: "center",
+                        }}
+                      >
+                        {registration.class_name}
+                      </AppText>
+                      <AppText
+                        style={{ fontSize: 12, width: 80, textAlign: "center" }}
+                      >
+                        {registration.class_price}
+                      </AppText>
+                      <AppText
+                        style={{ fontSize: 12, width: 80, textAlign: "center" }}
+                      >
+                        {registration.currency}
+                      </AppText>
+                      <AppText
+                        style={{
+                          fontSize: 12,
+                          width: 120,
+                          textAlign: "center",
+                        }}
+                      >
+                        {registration.academic_context?.name}
+                      </AppText>
+                      <AppText
+                        style={{
+                          fontSize: 12,
+                          width: 120,
+                          textAlign: "center",
+                        }}
+                      >
+                        {registration.academic_context?.academic_stage.name}
+                      </AppText>
+                      <AppText
+                        style={{
+                          fontSize: 12,
+                          width: 150,
+                          textAlign: "center",
+                        }}
+                      >
+                        {
+                          registration.academic_context?.academic_stage
+                            .educational_system.name
+                        }
+                      </AppText>
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: "#ff4444",
+                          paddingVertical: 6,
+                          paddingHorizontal: 12,
+                          borderRadius: 4,
+                        }}
+                        onPress={() =>
+                          removePendingRegistration(registration.id)
+                        }
+                      >
+                        <AppText style={{ color: "white", fontSize: 12 }}>
+                          {t("remove")}
+                        </AppText>
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </View>
+              </ScrollView>
+            )}
+          </View>
         </View>
 
         <TouchableOpacity
@@ -1514,7 +1533,7 @@ export default function TeacherBookingScreen() {
           </AppText>
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View>
+            <View style={{ backgroundColor: "#fff", padding: 5 }}>
               {/* رأس الجدول */}
               <View
                 style={{
