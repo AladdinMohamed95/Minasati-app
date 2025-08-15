@@ -14,7 +14,7 @@ const LoadingContext = createContext<LoadingContextType>({
   hideLoading: () => {},
 });
 
-export const LoadinggProvider: React.FC<React.PropsWithChildren> = ({
+export const LoadingProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
   const [isLoading, setIsLoading] = useState(false);

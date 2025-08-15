@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "922411210008",
+    "project_id": "keen-896a8",
+    "storage_bucket": "keen-896a8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:922411210008:android:5f52c23d6e42b2b0523a6d",
+        "android_client_info": {
+          "package_name": "com.aladdinmohamed.keen"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "922411210008-gnfghgeijd3ml14sv5mtpj3i36p7pbji.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aladdinmohamed.keen",
+            "certificate_hash": "a7844982ca16d08d2ce2d1fa3a426e863508f29f"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfAlURwuCVNEbh969Kp3ORSVbJddTAdXM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

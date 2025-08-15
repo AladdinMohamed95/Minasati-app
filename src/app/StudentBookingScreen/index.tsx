@@ -22,7 +22,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -339,7 +339,7 @@ const StudentBookingScreen = () => {
         {/* System Selection */}
         <View style={styles.studentBookingViewStyles.inputContainer}>
           <AppText style={styles.studentBookingViewStyles.label}>
-            النظام التعليمي
+            {t("system")}
           </AppText>
           <View style={styles.studentBookingViewStyles.pickerContainer}>
             <Picker
@@ -348,7 +348,7 @@ const StudentBookingScreen = () => {
               style={styles.studentBookingViewStyles.picker}
               enabled={!loading.systems}
             >
-              <Picker.Item label="اختر النظام التعليمي" value={null} />
+              <Picker.Item value={null} />
               {systems?.map((system) => (
                 <Picker.Item
                   key={system.id}
@@ -369,7 +369,7 @@ const StudentBookingScreen = () => {
         {/* Stage Selection */}
         <View style={styles.studentBookingViewStyles.inputContainer}>
           <AppText style={styles.studentBookingViewStyles.label}>
-            المرحلة الدراسية
+            {t("stage")}
           </AppText>
           <View style={styles.studentBookingViewStyles.pickerContainer}>
             <Picker
@@ -378,7 +378,7 @@ const StudentBookingScreen = () => {
               style={styles.studentBookingViewStyles.picker}
               enabled={!loading.stages && selectedSystem != null}
             >
-              <Picker.Item label="اختر المرحلة الدراسية" value={null} />
+              <Picker.Item value={null} />
               {stages.map((stage) => (
                 <Picker.Item
                   key={stage.id}
@@ -399,7 +399,7 @@ const StudentBookingScreen = () => {
         {/* Academic Years Selection */}
         <View style={styles.studentBookingViewStyles.inputContainer}>
           <AppText style={styles.studentBookingViewStyles.label}>
-            الصف الدراسي
+            {t("class")}
           </AppText>
           <View style={styles.studentBookingViewStyles.pickerContainer}>
             <Picker
@@ -425,7 +425,7 @@ const StudentBookingScreen = () => {
         {/* Class Selection */}
         <View style={styles.studentBookingViewStyles.inputContainer}>
           <AppText style={styles.studentBookingViewStyles.label}>
-            المادة الدراسية
+            {t("classItem")}
           </AppText>
           <View style={styles.studentBookingViewStyles.pickerContainer}>
             <Picker
@@ -452,7 +452,7 @@ const StudentBookingScreen = () => {
         {teachers.length > 0 && (
           <View style={styles.studentBookingViewStyles.inputContainer}>
             <AppText style={styles.studentBookingViewStyles.label}>
-              اختر المعلم
+              {t("chooseTeacher")}
             </AppText>
             {loading.teachers ? (
               <ActivityIndicator
@@ -502,7 +502,7 @@ const StudentBookingScreen = () => {
                     <AppText
                       style={styles.studentBookingViewStyles.selectTeacherText}
                     >
-                      اختر المعلم
+                      {t("chooseTeacher")}
                     </AppText>
                   )}
                   <Ionicons name="chevron-down" size={20} color="#7C3AED" />

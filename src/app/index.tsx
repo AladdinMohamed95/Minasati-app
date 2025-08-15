@@ -8,7 +8,7 @@ import { UserType } from "@/types/api";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView, StatusBar, TouchableOpacity, View } from "react-native";
 
@@ -43,6 +43,14 @@ const HomeScreen = () => {
 
   const handleAddRegistrations = () => {
     router.push("/TeacherRegistrationsScreen");
+  };
+
+  const handleStudentInquery = () => {
+    router.push("/StudentInqueries");
+  };
+
+  const handleTeacherInquery = () => {
+    router.push("/TeacherInqueries");
   };
 
   return (
@@ -103,9 +111,18 @@ const HomeScreen = () => {
               style={styles.homeScreen.card}
               onPress={handleComplain}
             >
-              <Ionicons name="calendar-outline" size={30} color="#063159" />
+              <Ionicons name="alert-circle-outline" size={30} color="#063159" />
               <AppText style={styles.homeScreen.cardText}>
                 {t("complaint")}
+              </AppText>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.homeScreen.card}
+              onPress={handleStudentInquery}
+            >
+              <Ionicons name="help-circle-outline" size={30} color="#063159" />
+              <AppText style={styles.homeScreen.cardText}>
+                {t("inquery")}
               </AppText>
             </TouchableOpacity>
           </>
@@ -127,6 +144,15 @@ const HomeScreen = () => {
               <Ionicons name="add-circle-outline" size={30} color="#063159" />
               <AppText style={styles.homeScreen.cardText}>
                 {t("addClass")}
+              </AppText>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.homeScreen.card}
+              onPress={handleTeacherInquery}
+            >
+              <Ionicons name="calendar-outline" size={30} color="#063159" />
+              <AppText style={styles.homeScreen.cardText}>
+                {t("inquery")}
               </AppText>
             </TouchableOpacity>
           </>

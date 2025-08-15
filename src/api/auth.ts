@@ -3,6 +3,7 @@ import {
   LoginResponse,
   RegisterRequest,
   RegisterResponse,
+  TokenRequest,
   UserType,
 } from "@/types/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -92,4 +93,11 @@ export const teacherLogout = async (): Promise<string> => {
     "userType",
   ]);
   return message;
+};
+
+export const sendFirebaseToken = async (
+  request: TokenRequest
+): Promise<{ message: string }> => {
+  const response = await api.post("/api/teacher/device-tokens", request);
+  return response.data as { message: string };
 };

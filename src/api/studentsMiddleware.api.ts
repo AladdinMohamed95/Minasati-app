@@ -4,6 +4,8 @@ import {
   BookingResponse,
   ComplaintRequest,
   ComplaintResponse,
+  InqueryRequest,
+  InqueryResponse,
   RegisterRequest,
   StudentProfileResponse,
   Teacher,
@@ -109,4 +111,23 @@ export const getTeachers = async (
   });
 
   return response.data.data as Teacher[];
+};
+
+export const showInqueries = async (): Promise<InqueryResponse[]> => {
+  const response = await api.get("/api/student/inquiries");
+  const payload = response.data;
+  return Array.isArray(payload) ? payload : payload?.data ?? [];
+};
+
+export const getInqueries = async (params?: any) => {
+  const response = await api.get("/api/student/inquiries", { params });
+  return response.data;
+};
+
+export const createInquery = async (
+  request: InqueryRequest
+): Promise<{ message: string }> => {
+  const response = await api.post("/api/student/inquiries", { request });
+  console.log("create complaint ", response);
+  return response.data as { message: string };
 };

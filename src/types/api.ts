@@ -29,6 +29,8 @@ export type RegisterResponse = {
   token_type: string;
 };
 //-----------------------------------
+export type TokenRequest = { token: string; device_type: string };
+//-----------------------------------
 export type StudentProfileResponse = {
   id: number;
   name: string;
@@ -53,8 +55,27 @@ export type ComplaintResponse = {
 export type ComplaintRequest = {
   subject: string;
   message: string;
-  teacher_id?: string;
 };
+
+export type InqueryRequest = {
+  subject: string;
+  message: string;
+};
+
+export type InqueryResponse = {
+  id: number;
+  subject: string;
+  message: string;
+  status: string;
+  submitted_at: string;
+  complaint_about_teacher: {
+    id: number;
+    name: string;
+    phone: string | null;
+    image_url: string | null;
+  } | null;
+};
+
 //-----------------------------------
 export interface Booking {
   booking_id: number;

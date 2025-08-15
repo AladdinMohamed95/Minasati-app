@@ -1,10 +1,10 @@
-import { createComplaint, showComplaints } from "@/api/studentsMiddleware.api";
+import { createInquery, showInqueries } from "@/api/teachersMiddleware.api";
 import AppText from "@/components/AppText";
 import { useTheme } from "@/context/ThemeContext";
 import { useTranslationContext } from "@/context/TranslationContext";
 import { useUser } from "@/context/UserContext";
 import { createStyles } from "@/styles";
-import { ComplaintRequest, ComplaintResponse } from "@/types/api";
+import { InqueryRequest, InqueryResponse } from "@/types/api";
 import { getStatusColor } from "@/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -21,49 +21,49 @@ import {
   View,
 } from "react-native";
 
-const ComplaintScreen = () => {
+const TeacherInqueryScreen = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const styles = createStyles(theme);
   const { language } = useTranslationContext();
   const { user } = useUser();
 
-  const [formData, setFormData] = useState<ComplaintRequest>({
+  const [formData, setFormData] = useState<InqueryRequest>({
     subject: "",
     message: "",
   });
 
   const [loading, setLoading] = useState({
     submitting: false,
-    complaints: false,
+    inqueries: false,
   });
-  const [complaints, setComplaints] = useState<ComplaintResponse[]>([]);
+  const [inqueries, setinqueries] = useState<InqueryResponse[]>([]);
 
   useEffect(() => {
-    loadComplaints();
+    loadInqueries();
   }, []);
 
-  const loadComplaints = async () => {
-    setLoading((prev) => ({ ...prev, complaints: true }));
+  const loadInqueries = async () => {
+    setLoading((prev) => ({ ...prev, inqueries: true }));
     try {
-      const complaints = await showComplaints();
-      console.log("complaints " + JSON.stringify(complaints));
-      setComplaints(complaints);
+      const inqueries = await showInqueries();
+      console.log(" inqueries " + JSON.stringify(inqueries));
+      setinqueries(inqueries);
     } catch (error) {
       console.error("Error loading teachers:", error);
     } finally {
-      setLoading((prev) => ({ ...prev, complaints: false }));
+      setLoading((prev) => ({ ...prev, inqueries: false }));
     }
   };
 
   const handleInputChange = (
-    field: keyof ComplaintRequest,
+    field: keyof InqueryRequest,
     value: string | number | boolean
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleComplaint = async () => {
+  const handleInquery = async () => {
     setLoading((prev) => ({ ...prev, submitting: true }));
     if (!user?.id) {
       Alert.alert(t("error"), t("pleaseLogin"), [
@@ -74,7 +74,7 @@ const ComplaintScreen = () => {
               subject: "",
               message: "",
             });
-            setLoading({ submitting: false, complaints: false });
+            setLoading({ submitting: false, inqueries: false });
             router.push("/LoginScreen");
           },
         },
@@ -82,13 +82,13 @@ const ComplaintScreen = () => {
       return;
     }
     try {
-      const response = await createComplaint({
+      const response = await createInquery({
         message: formData.message,
         subject: formData.subject,
       });
 
       if (response?.message) {
-        Alert.alert(t("complaintSuccess"), t("complaintsSendSuccessfully"), [
+        Alert.alert(t(" inqueriesuccess"), t(" inqueriesSendSuccessfully"), [
           {
             text: t("ok"),
             onPress: () => {
@@ -100,13 +100,13 @@ const ComplaintScreen = () => {
           },
         ]);
       } else {
-        Alert.alert(t("error"), t("complaintSubmissionFailed"));
+        Alert.alert(t("error"), t(" inqueriesubmissionFailed"));
       }
     } catch (error) {
-      console.error("Error submitting complaint:", error);
-      Alert.alert(t("error"), t("complaintSubmissionFailed"));
+      console.error("Error submitting  inquery:", error);
+      Alert.alert(t("error"), t(" inqueriesubmissionFailed"));
     } finally {
-      setLoading((prev) => ({ ...prev, submitting: false, complaints: false }));
+      setLoading((prev) => ({ ...prev, submitting: false, inqueries: false }));
     }
   };
 
@@ -127,11 +127,11 @@ const ComplaintScreen = () => {
           <View style={styles.homeScreen.headerContent}>
             <View>
               <AppText style={styles.homeScreen.welcomeText}>
-                {t("register")} {t("complaint")}
+                {t("inquery")}
               </AppText>
             </View>
             <TouchableOpacity
-              onPress={handleComplaint}
+              onPress={handleInquery}
               disabled={isSubmitDisabled}
               style={[
                 styles.homeScreen.iconBorder,
@@ -141,7 +141,7 @@ const ComplaintScreen = () => {
               {loading.submitting ? (
                 <ActivityIndicator size="small" color="#fff" />
               ) : (
-                <Ionicons name="alert-circle-outline" size={30} color="#fff" />
+                <Ionicons name="help-circle-outline" size={30} color="#fff" />
               )}
             </TouchableOpacity>
           </View>
@@ -181,14 +181,14 @@ const ComplaintScreen = () => {
           }}
         >
           <AppText style={{ fontSize: 18, marginBottom: 10 }}>
-            {t("complaintsList")}
+            {t("inqueriesList")}
           </AppText>
           <View style={{ backgroundColor: "#fff", padding: 5 }}>
-            {loading.complaints ? (
+            {loading.inqueries ? (
               <ActivityIndicator size="large" color="#7C3AED" />
-            ) : complaints.length === 0 ? (
+            ) : inqueries.length === 0 ? (
               <AppText style={{ textAlign: "center", color: "#888" }}>
-                {t("noComplaints")}
+                {t("noInqueries")}
               </AppText>
             ) : (
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -233,9 +233,9 @@ const ComplaintScreen = () => {
                   </View>
 
                   {/* صفوف الجدول */}
-                  {complaints.map((complaint) => (
+                  {inqueries.map((inquery) => (
                     <View
-                      key={complaint.id}
+                      key={inquery.id}
                       style={{
                         flexDirection: "row",
                         paddingVertical: 12,
@@ -253,7 +253,7 @@ const ComplaintScreen = () => {
                           textAlign: "center",
                         }}
                       >
-                        {complaint.subject}
+                        {inquery.subject}
                       </AppText>
                       <AppText
                         style={{
@@ -262,17 +262,17 @@ const ComplaintScreen = () => {
                           textAlign: "center",
                         }}
                       >
-                        {complaint.message}
+                        {inquery.message}
                       </AppText>
                       <AppText
                         style={{
                           fontSize: 12,
                           width: 120,
                           textAlign: "center",
-                          color: getStatusColor(complaint.status),
+                          color: getStatusColor(inquery.status),
                         }}
                       >
-                        {complaint.status}
+                        {inquery.status}
                       </AppText>
                       <AppText
                         style={{
@@ -281,18 +281,7 @@ const ComplaintScreen = () => {
                           textAlign: "center",
                         }}
                       >
-                        {complaint.submitted_at?.split(" ")[0]}
-                      </AppText>
-                      <AppText
-                        style={{
-                          fontSize: 12,
-                          width: 200,
-                          textAlign: "center",
-                        }}
-                      >
-                        {complaint.complaint_about_teacher
-                          ? complaint.complaint_about_teacher.name
-                          : "-"}
+                        {inquery.submitted_at?.split(" ")[0]}
                       </AppText>
                     </View>
                   ))}
@@ -306,4 +295,4 @@ const ComplaintScreen = () => {
   );
 };
 
-export default ComplaintScreen;
+export default TeacherInqueryScreen;

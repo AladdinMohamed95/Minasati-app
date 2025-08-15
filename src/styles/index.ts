@@ -223,7 +223,6 @@ export const createStyles = (theme: Theme) => {
       flexWrap: "wrap",
       justifyContent: "center",
       marginTop: 20,
-      paddingHorizontal: 10,
     },
     card: {
       backgroundColor: "#fff",

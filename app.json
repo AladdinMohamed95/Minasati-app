@@ -22,6 +22,7 @@
       }
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "splash": {
         "image": "./src/assets/images/splash-icon.png",
         "backgroundColor": "#05294D",
@@ -55,7 +56,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "8b51ede0-996a-4312-826b-9e672e197d61"
+        "projectId": "079a4dc9-30a8-4f44-aefa-b04672cb1b34"
       }
     }
   }

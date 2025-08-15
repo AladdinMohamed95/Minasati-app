@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "542404302994",
+    "project_id": "keenedu-60e8f",
+    "storage_bucket": "keenedu-60e8f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:542404302994:android:a95e4f6c13d6d068e96e4b",
+        "android_client_info": {
+          "package_name": "com.aladdinmohamed.keen"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDCu2SKSSpEtHnDlosDCidB1eBt5a_ZN20"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

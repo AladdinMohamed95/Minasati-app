@@ -1,5 +1,7 @@
 import {
   BookingItem,
+  InqueryRequest,
+  InqueryResponse,
   MultiRegistrationRequest,
   RegistrationItem,
   RegistrationRequest,
@@ -208,4 +210,23 @@ export const deleteTeacherRegistration = async (
 export const getTeacherBookings = async (): Promise<BookingItem[]> => {
   const response = await api.get("/api/teacher/bookings");
   return response.data.data as BookingItem[];
+};
+
+export const showInqueries = async (): Promise<InqueryResponse[]> => {
+  const response = await api.get("/api/teacher/inquiries");
+  const payload = response.data;
+  return Array.isArray(payload) ? payload : payload?.data ?? [];
+};
+
+export const getInqueries = async (params?: any) => {
+  const response = await api.get("/api/teacher/inquiries", { params });
+  return response.data;
+};
+
+export const createInquery = async (
+  request: InqueryRequest
+): Promise<{ message: string }> => {
+  const response = await api.post("/api/teacher/inquiries", { request });
+  console.log("create complaint ", response);
+  return response.data as { message: string };
 };
